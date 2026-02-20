@@ -36,7 +36,6 @@ public class Main extends Application {
 
         stage.setTitle("Ordenador - JavaFX v" + javafxVersion);
 
-
         SortView view = new SortView();
         Scene scene = new Scene(view.getRoot(), 800, 600);
         scene.getStylesheets().add(
