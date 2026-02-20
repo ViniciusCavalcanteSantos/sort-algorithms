@@ -39,7 +39,7 @@ public class CanvasChartView implements IChartView {
 
         // Label
         infoLabel = new Label("Ciclos: 0; Trocas: 0");
-        infoLabel.setStyle("-fx-font-size: 30px;-fx-text-fill: red");
+        infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
 
         root.getChildren().addAll(chart, infoLabel);
     }
