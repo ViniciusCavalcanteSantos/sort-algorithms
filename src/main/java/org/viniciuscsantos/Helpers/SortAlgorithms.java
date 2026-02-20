@@ -30,11 +30,11 @@ public class SortAlgorithms {
                     isSorted = false;
                     swaps++;
 
-                    int finalCycles = cycles;
-                    int finalSwaps = swaps;
-                    int[] finalArray = unsortedArray.clone();
+                    int cyclesSnapshot = cycles;
+                    int swapsSnapshot = swaps;
+                    int[] arraySnapshot = unsortedArray.clone();
                     Platform.runLater(() -> {
-                        chart.updateChart(finalArray, new SortStats(finalCycles, finalSwaps));
+                        chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
                     });
                     try {
                         Thread.sleep(2);
