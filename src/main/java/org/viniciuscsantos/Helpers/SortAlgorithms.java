@@ -32,8 +32,9 @@ public class SortAlgorithms {
 
                     int finalCycles = cycles;
                     int finalSwaps = swaps;
+                    int[] finalArray = unsortedArray.clone();
                     Platform.runLater(() -> {
-                        chart.updateChart(array, new SortStats(finalCycles, finalSwaps));
+                        chart.updateChart(finalArray, new SortStats(finalCycles, finalSwaps));
                     });
                     try {
                         Thread.sleep(2);
