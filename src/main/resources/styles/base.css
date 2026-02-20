@@ -1,0 +1,7 @@
+.titulo {
+    -fx-background-color: aqua;
+}
+
+.titulo:hover {
+    -fx-background-color: #137878;
+}
