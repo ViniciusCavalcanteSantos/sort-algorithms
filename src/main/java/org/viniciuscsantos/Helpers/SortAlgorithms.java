@@ -2,6 +2,7 @@ package org.viniciuscsantos.Helpers;
 
 import javafx.application.Platform;
 import org.viniciuscsantos.Views.ChartView;
+import org.viniciuscsantos.Views.SortStats;
 
 import java.util.Arrays;
 import java.util.Timer;
@@ -13,7 +14,8 @@ public class SortAlgorithms {
         TimeManager timeManager = new TimeManager();
         timeManager.startTimer("teste");
 
-        int attempts = 0;
+        int cycles = 0;
+        int swaps = 0;
         for (int i = 0; i < unsortedArray.length; i++) {
             boolean isSorted = true;
 
@@ -21,19 +23,20 @@ public class SortAlgorithms {
                 int current = unsortedArray[j];
                 int next = unsortedArray[j + 1];
 
-                attempts++;
+                cycles++;
                 if(current > next) {
                     unsortedArray[j] = next;
                     unsortedArray[j + 1] = current;
                     isSorted = false;
+                    swaps++;
 
-                    int finalAttempts = attempts;
+                    int finalCycles = cycles;
+                    int finalSwaps = swaps;
                     Platform.runLater(() -> {
-                        IO.println(Arrays.toString(unsortedArray));
-                        chart.updateChart(unsortedArray, finalAttempts);
+                        chart.updateChart(array, new SortStats(finalCycles, finalSwaps));
                     });
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(2);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

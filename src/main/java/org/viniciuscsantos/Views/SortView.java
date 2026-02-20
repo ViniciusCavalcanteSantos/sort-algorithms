@@ -86,7 +86,7 @@ public class SortView {
 
         ArrayHelper.shuffle(array, true);
 
-        chart.updateChart(array, 0);
+        chart.updateChart(array, new SortStats(0, 0));
 
         (new Thread(() -> {
             SortAlgorithms.bubbleSort(array, chart);

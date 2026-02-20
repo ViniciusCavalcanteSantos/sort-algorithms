@@ -23,32 +23,34 @@ public class ChartView {
         root.setPadding(new Insets(10, 5, 0, 5));
 
         // Gráfico
-        chart = new HBox(2);
+        chart = new HBox(0);
         chart.setPrefSize(chartWidth, chartHeight);
         chart.setMinWidth(chartWidth);
         chart.setMaxWidth(chartWidth);
+        chart.setMinHeight(chartHeight);
+        chart.setMaxHeight(chartHeight);
         chart.setAlignment(Pos.BOTTOM_CENTER);
         chart.setStyle("-fx-background-color: aqua;");
         chart.setPadding(new Insets(10, 5, 0, 5));
 
         // Label
-        infoLabel = new Label("Tentativas: 0");
+        infoLabel = new Label("Ciclos: 0; Trocas: 0");
         infoLabel.setStyle("-fx-font-size: 30px;-fx-text-fill: red");
 
         root.getChildren().addAll(chart, infoLabel);
     }
 
-    public void updateChart(int[] numbers, int attempts) {
+    public void updateChart(int[] numbers, SortStats stats) {
         chart.getChildren().clear();
 
-        infoLabel.setText("Tentativas: "+attempts);
+        infoLabel.setText("Ciclos: %d; Trocas: %d".formatted(stats.getCycles(), stats.getSwaps()));
 
-        double containerHeight = chart.getHeight() == 0.0 ? chartHeight : chart.getHeight() - 10;
+        double containerHeight = chartHeight - 10;
         int biggestNumber = ArrayHelper.getMax(numbers);
 
         for (int i = 0; i < numbers.length; i++) {
             int number = numbers[i];
-            float percentage = (float) number / biggestNumber;
+            double percentage = (double) number / biggestNumber;
             double height = containerHeight * percentage;
 
             addBar(height);
