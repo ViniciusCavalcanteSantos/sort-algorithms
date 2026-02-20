@@ -12,6 +12,8 @@ public class SortAlgorithms {
 
         TimeManager timeManager = new TimeManager();
         timeManager.startTimer("teste");
+
+        int attempts = 0;
         for (int i = 0; i < unsortedArray.length; i++) {
             boolean isSorted = true;
 
@@ -19,14 +21,16 @@ public class SortAlgorithms {
                 int current = unsortedArray[j];
                 int next = unsortedArray[j + 1];
 
+                attempts++;
                 if(current > next) {
                     unsortedArray[j] = next;
                     unsortedArray[j + 1] = current;
                     isSorted = false;
 
+                    int finalAttempts = attempts;
                     Platform.runLater(() -> {
                         IO.println(Arrays.toString(unsortedArray));
-                        chart.updateChart(unsortedArray);
+                        chart.updateChart(unsortedArray, finalAttempts);
                     });
                     try {
                         Thread.sleep(100);
@@ -36,9 +40,7 @@ public class SortAlgorithms {
                 }
             }
 
-            if(isSorted) {
-                break;
-            }
+            if(isSorted) break;
         }
         timeManager.finishTimer("teste");
         IO.println(timeManager.getTimePassed("teste"));

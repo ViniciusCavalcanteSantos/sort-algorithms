@@ -2,32 +2,48 @@ package org.viniciuscsantos.Views;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import org.viniciuscsantos.Helpers.ArrayHelper;
 
 public class ChartView {
-    private HBox root;
+    private VBox root;
 
-    double defaultWidth = 300;
-    double defaultHeight = 300;
+    private HBox chart;
+    private Label infoLabel;
+
+    double chartWidth = 300;
+    double chartHeight = 300;
 
     public ChartView() {
-        root = new HBox(2);
-        root.setPrefSize(defaultWidth, defaultHeight);
-        root.setMinWidth(defaultWidth);
-        root.setMaxWidth(defaultWidth);
-        root.setAlignment(Pos.BOTTOM_CENTER);
+        root = new VBox(5);
         root.setPadding(new Insets(10, 5, 0, 5));
 
-        root.setStyle("-fx-background-color: aqua;");
+        // Gráfico
+        chart = new HBox(2);
+        chart.setPrefSize(chartWidth, chartHeight);
+        chart.setMinWidth(chartWidth);
+        chart.setMaxWidth(chartWidth);
+        chart.setAlignment(Pos.BOTTOM_CENTER);
+        chart.setStyle("-fx-background-color: aqua;");
+        chart.setPadding(new Insets(10, 5, 0, 5));
+
+        // Label
+        infoLabel = new Label("Tentativas: 0");
+        infoLabel.setStyle("-fx-font-size: 30px;-fx-text-fill: red");
+
+        root.getChildren().addAll(chart, infoLabel);
     }
 
-    public void updateChart(int[] numbers) {
-        root.getChildren().clear();
+    public void updateChart(int[] numbers, int attempts) {
+        chart.getChildren().clear();
 
-        double containerHeight = root.getHeight() == 0.0 ? defaultHeight : root.getHeight() - 10;
+        infoLabel.setText("Tentativas: "+attempts);
+
+        double containerHeight = chart.getHeight() == 0.0 ? chartHeight : chart.getHeight() - 10;
         int biggestNumber = ArrayHelper.getMax(numbers);
 
         for (int i = 0; i < numbers.length; i++) {
@@ -48,10 +64,10 @@ public class ChartView {
         bar.setStyle("-fx-background-color: red;");
         HBox.setHgrow(bar, Priority.ALWAYS);
 
-        root.getChildren().add(bar);
+        chart.getChildren().add(bar);
     }
 
-    public HBox getRoot() {
+    public VBox getRoot() {
         return root;
     }
 }

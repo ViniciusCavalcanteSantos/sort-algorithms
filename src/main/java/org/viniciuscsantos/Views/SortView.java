@@ -78,7 +78,7 @@ public class SortView {
         workerThread.start();
     }
 
-    public HBox getBarChart() {
+    public VBox getBarChart() {
         ChartView chart = new ChartView();
 
         int[] array = IntStream.rangeClosed(20, 40).toArray();
@@ -86,7 +86,7 @@ public class SortView {
 
         ArrayHelper.shuffle(array, true);
 
-        chart.updateChart(array);
+        chart.updateChart(array, 0);
 
         (new Thread(() -> {
             SortAlgorithms.bubbleSort(array, chart);
