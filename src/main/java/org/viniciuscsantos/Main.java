@@ -22,22 +22,11 @@ public class Main extends Application {
         SortView mainScreen = new SortView();
         TimeManager timeManager = new TimeManager();
 
-
-        int[] array = IntStream.rangeClosed(1, arraySize).toArray();
-
-        timeManager.startTimer("shuffle");
-        ArrayHelper.shuffle(array, true);
-        timeManager.finishTimer("shuffle");
-
-        IO.println(timeManager.getTimePassed("shuffle"));
-        System.out.println(timeManager.getTimePassed("shuffle"));
-
         String javafxVersion = System.getProperty("javafx.version");
 
         stage.setTitle("Ordenador - JavaFX v" + javafxVersion);
 
-        SortView view = new SortView();
-        Scene scene = new Scene(view.getRoot(), 800, 600);
+        Scene scene = new Scene(mainScreen.getRoot(), 800, 600);
         scene.getStylesheets().add(
                 getClass().getResource("/styles/base.css").toExternalForm()
         );

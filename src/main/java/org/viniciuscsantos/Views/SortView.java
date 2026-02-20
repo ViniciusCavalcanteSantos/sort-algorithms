@@ -2,11 +2,17 @@ package org.viniciuscsantos.Views;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.viniciuscsantos.Helpers.ArrayHelper;
+
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.stream.IntStream;
 
 public class SortView {
     private VBox root;
@@ -18,7 +24,10 @@ public class SortView {
     int counter = 0;
 
     public SortView() {
-        this.root = new VBox(10);
+        root = new VBox(10);
+        root.setStyle("-fx-background-color: blue;");
+
+
 
         // Elementos
         button = new Button("Iniciar");
@@ -30,7 +39,7 @@ public class SortView {
             toggleCounter();
         });
 
-        root.getChildren().addAll(labelCounter, button);
+        root.getChildren().addAll(getBarChart(), button);
 
     }
 
@@ -39,7 +48,8 @@ public class SortView {
             workerThread.interrupt();
             return;
         }
-
+        IO.println(root.getWidth());
+        IO.println(root.getHeight());
         IO.println("Iniciando contador");
         button.setText("Pausar");
         workerThread = new Thread(() -> {
@@ -67,6 +77,28 @@ public class SortView {
             }
         });
         workerThread.start();
+    }
+
+    public HBox getBarChart() {
+        int[] array = IntStream.rangeClosed(20, 40).toArray();
+        IO.println(Arrays.toString(array));
+
+        ArrayHelper.shuffle(array, true);
+
+        ChartView chart = new ChartView();
+        chart.updateChart(array);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    ArrayHelper.shuffle(array, true);
+                    chart.updateChart(array);
+                });
+            }
+        }, 3000);
+
+        return chart.getRoot();
     }
 
     public VBox getRoot() {
