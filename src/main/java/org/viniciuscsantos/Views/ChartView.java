@@ -20,13 +20,14 @@ public class ChartView {
         root.setMaxWidth(defaultWidth);
         root.setAlignment(Pos.BOTTOM_CENTER);
         root.setPadding(new Insets(10, 5, 0, 5));
+
         root.setStyle("-fx-background-color: aqua;");
     }
 
     public void updateChart(int[] numbers) {
         root.getChildren().clear();
 
-        double containerHeight = root.getHeight() == 0.0 ? defaultHeight : root.getHeight();
+        double containerHeight = root.getHeight() == 0.0 ? defaultHeight : root.getHeight() - 10;
         int biggestNumber = ArrayHelper.getMax(numbers);
 
         for (int i = 0; i < numbers.length; i++) {

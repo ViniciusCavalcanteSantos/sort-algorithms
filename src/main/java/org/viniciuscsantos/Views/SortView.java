@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.viniciuscsantos.Helpers.ArrayHelper;
+import org.viniciuscsantos.Helpers.SortAlgorithms;
 
 import java.util.Arrays;
 import java.util.Timer;
@@ -26,8 +27,6 @@ public class SortView {
     public SortView() {
         root = new VBox(10);
         root.setStyle("-fx-background-color: blue;");
-
-
 
         // Elementos
         button = new Button("Iniciar");
@@ -80,23 +79,18 @@ public class SortView {
     }
 
     public HBox getBarChart() {
+        ChartView chart = new ChartView();
+
         int[] array = IntStream.rangeClosed(20, 40).toArray();
         IO.println(Arrays.toString(array));
 
         ArrayHelper.shuffle(array, true);
 
-        ChartView chart = new ChartView();
         chart.updateChart(array);
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    ArrayHelper.shuffle(array, true);
-                    chart.updateChart(array);
-                });
-            }
-        }, 3000);
+        (new Thread(() -> {
+            SortAlgorithms.bubbleSort(array, chart);
+        })).start();
 
         return chart.getRoot();
     }
