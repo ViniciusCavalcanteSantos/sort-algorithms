@@ -26,6 +26,10 @@ public class ArrayHelper {
     }
 
     public static int getMax(int[] array) {
+        if(array == null || array.length == 0) {
+            return 0;
+        }
+
         int max = array[0];
         for (int i = 1; i < array.length; i++) {
             if (array[i] > max) {
