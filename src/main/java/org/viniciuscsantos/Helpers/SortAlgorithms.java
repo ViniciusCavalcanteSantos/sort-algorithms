@@ -1,14 +1,11 @@
 package org.viniciuscsantos.Helpers;
 
 import javafx.application.Platform;
-import org.viniciuscsantos.Views.ChartView;
+import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
-import java.util.Arrays;
-import java.util.Timer;
-
 public class SortAlgorithms {
-    public static int[] bubbleSort(int[] array, ChartView chart) {
+    public static int[]     bubbleSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         TimeManager timeManager = new TimeManager();
