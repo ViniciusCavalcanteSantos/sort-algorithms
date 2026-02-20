@@ -15,7 +15,7 @@ public class ChartView {
     private HBox chart;
     private Label infoLabel;
 
-    double chartWidth = 300;
+    double chartWidth = 600;
     double chartHeight = 300;
 
     public ChartView() {
@@ -41,20 +41,32 @@ public class ChartView {
     }
 
     public void updateChart(int[] numbers, SortStats stats) {
-        chart.getChildren().clear();
-
         infoLabel.setText("Ciclos: %d; Trocas: %d".formatted(stats.getCycles(), stats.getSwaps()));
 
         double containerHeight = chartHeight - 10;
         int biggestNumber = ArrayHelper.getMax(numbers);
 
-        for (int i = 0; i < numbers.length; i++) {
-            int number = numbers[i];
-            double percentage = (double) number / biggestNumber;
-            double height = containerHeight * percentage;
+        if(chart.getChildren().isEmpty()) {
+            for (int i = 0; i < numbers.length; i++) {
+                int number = numbers[i];
+                double percentage = (double) number / biggestNumber;
+                double height = containerHeight * percentage;
 
-            addBar(height);
+                addBar(height);
+            }
+        } else {
+            for (int i = 0; i < numbers.length; i++) {
+                int number = numbers[i];
+                double percentage = (double) number / biggestNumber;
+                double height = containerHeight * percentage;
+
+                Region bar = (Region) chart.getChildren().get(i);
+                bar.setPrefHeight(height);
+                bar.setMinHeight(height);
+                bar.setMaxHeight(height);
+            }
         }
+
     }
 
     private void addBar(double height) {
