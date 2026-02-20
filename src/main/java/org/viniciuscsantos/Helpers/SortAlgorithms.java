@@ -5,7 +5,7 @@ import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
 public class SortAlgorithms {
-    public static int[]     bubbleSort(int[] array, IChartView chart) {
+    public static int[] bubbleSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         TimeManager timeManager = new TimeManager();

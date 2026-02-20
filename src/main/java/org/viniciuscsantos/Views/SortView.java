@@ -29,9 +29,9 @@ public class SortView {
     TextField tfAmount;
 
     int[] mainArray;
-    IChartView chart;
 
-    Thread mainThread;
+    IChartView[] charts;
+    Thread[] threads;
 
     public SortView() {
         root = new VBox(10);
@@ -86,7 +86,7 @@ public class SortView {
         grid.getChildren().addAll(cbRenderMethod, cbGenerateMethod, tfFrom, tfTo, tfAmount, buttonGenerate, button);
 
         chartsContainer = new HBox(10);
-        chartsContainer.getChildren().addAll(generateCharts());
+        generateCharts();
 
         // Seletor de modo de geração dos números
         cbGenerateMethod.getSelectionModel().selectedIndexProperty().addListener(
@@ -108,10 +108,11 @@ public class SortView {
             stopSort();
 
             chartsContainer.getChildren().clear();
-            chartsContainer.getChildren().addAll(generateCharts());
+            generateCharts();
         });
 
         button.setOnAction(actionEvent -> {
+            stopSort();
             startSort();
         });
 
@@ -121,7 +122,7 @@ public class SortView {
         );
     }
 
-    public VBox generateCharts() {
+    public void generateCharts() {
         String renderMethod = cbRenderMethod.getValue().toString();
         String generationMethod = cbGenerateMethod.getValue().toString();
 
@@ -129,10 +130,13 @@ public class SortView {
         int to = Integer.parseInt(tfTo.getText());
         int amount = Integer.parseInt(tfAmount.getText());
 
-        if(Objects.equals(renderMethod, "Canvas")) {
-            chart = new CanvasChartView();
-        } else {
-            chart = new ChartView();
+        charts = new IChartView[2];
+        for (int i = 0; i < charts.length; i++) {
+            if(Objects.equals(renderMethod, "Canvas")) {
+                charts[i] = new CanvasChartView();
+            } else {
+                charts[i] = new ChartView();
+            }
         }
 
         if(Objects.equals(generationMethod, "Ordenado")) {
@@ -149,20 +153,34 @@ public class SortView {
 
         IO.println("Array gerado");
         IO.println(Arrays.toString(mainArray));
-        chart.updateChart(mainArray, new SortStats(from, to));
-        return chart.getRoot();
+
+        for (int i = 0; i < charts.length; i++) {
+            charts[i].updateChart(mainArray, new SortStats(from, to));
+            chartsContainer.getChildren().add(charts[i].getRoot());
+        }
     }
 
     public void startSort() {
-        mainThread = new Thread(() -> {
-            SortAlgorithms.bubbleSort(mainArray, chart);
-        });
-        mainThread.start();
+        threads = new Thread[charts.length];
+        for (int i = 0; i < threads.length; i++) {
+            int iSnapshot = i;
+            threads[i] = new Thread(() -> {
+                SortAlgorithms.bubbleSort(mainArray, charts[iSnapshot]);
+            });
+        }
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i].start();
+        }
     }
 
     public void stopSort() {
-        if (mainThread != null && mainThread.isAlive()) {
-            mainThread.interrupt();
+        if(threads == null || threads.length == 0) return;
+
+        for (int i = 0; i < threads.length; i++) {
+            if (threads[i] != null && threads[i].isAlive()) {
+                threads[i].interrupt();
+            }
         }
     }
 
