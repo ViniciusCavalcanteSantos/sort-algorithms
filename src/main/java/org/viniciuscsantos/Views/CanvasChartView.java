@@ -19,6 +19,7 @@ public class CanvasChartView implements IChartView {
     private Canvas chart;
     private GraphicsContext gc;
 
+    private Label titleLabel;
     private Label infoLabel;
 
     double chartWidth = 300;
@@ -26,7 +27,7 @@ public class CanvasChartView implements IChartView {
 
     double prefGap = 2;
 
-    public CanvasChartView() {
+    public CanvasChartView(String title) {
         root = new VBox(5);
         root.setPadding(new Insets(10, 5, 0, 5));
 
@@ -37,11 +38,15 @@ public class CanvasChartView implements IChartView {
         gc.setFill(Color.AQUA);
         gc.fillRect(0, 0, chartWidth, chartHeight);
 
-        // Label
+        // Label Title
+        titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+
+        // Label Info
         infoLabel = new Label("Ciclos: 0; Trocas: 0");
         infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
 
-        root.getChildren().addAll(chart, infoLabel);
+        root.getChildren().addAll(titleLabel, chart, infoLabel);
     }
 
     public void updateChart(int[] numbers, SortStats stats) {

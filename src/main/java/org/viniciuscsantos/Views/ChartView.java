@@ -14,12 +14,13 @@ public class ChartView implements IChartView {
     private VBox root;
 
     private HBox chart;
+    private Label titleLabel;
     private Label infoLabel;
 
-    double chartWidth = 600;
+    double chartWidth = 300;
     double chartHeight = 300;
 
-    public ChartView() {
+    public ChartView(String title) {
         root = new VBox(5);
         root.setPadding(new Insets(10, 5, 0, 5));
 
@@ -34,11 +35,15 @@ public class ChartView implements IChartView {
         chart.setStyle("-fx-background-color: aqua;");
         chart.setPadding(new Insets(10, 5, 0, 5));
 
-        // Label
+        // Label Title
+        titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+
+        // Label Info
         infoLabel = new Label("Ciclos: 0; Trocas: 0");
         infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
 
-        root.getChildren().addAll(chart, infoLabel);
+        root.getChildren().addAll(titleLabel, chart, infoLabel);
     }
 
     public void updateChart(int[] numbers, SortStats stats) {

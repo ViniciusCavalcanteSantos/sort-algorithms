@@ -132,10 +132,19 @@ public class SortView {
 
         charts = new IChartView[2];
         for (int i = 0; i < charts.length; i++) {
-            if(Objects.equals(renderMethod, "Canvas")) {
-                charts[i] = new CanvasChartView();
+            String title;
+            if(i == 0) {
+                title = "Bubble Sort";
+            } else if (i == 1) {
+                title = "Selection Sort";
             } else {
-                charts[i] = new ChartView();
+                title = "";
+            }
+
+            if(Objects.equals(renderMethod, "Canvas")) {
+                charts[i] = new CanvasChartView(title);
+            } else {
+                charts[i] = new ChartView(title);
             }
         }
 
