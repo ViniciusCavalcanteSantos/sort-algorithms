@@ -45,17 +45,7 @@ public class SortAlgorithms {
                     isSorted = false;
                     swaps++;
 
-                    int cyclesSnapshot = cycles;
-                    int swapsSnapshot = swaps;
-                    int[] arraySnapshot = unsortedArray.clone();
-                    Platform.runLater(() -> {
-                        chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
-                    });
-                    try {
-                        Thread.sleep(sleepMillis);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    updateChart(unsortedArray, cycles, swaps, chart);
                 }
             }
 
@@ -99,17 +89,7 @@ public class SortAlgorithms {
             unsortedArray[minIndex] = temp;
             swaps++;
 
-            int cyclesSnapshot = cycles;
-            int swapsSnapshot = swaps;
-            int[] arraySnapshot = unsortedArray.clone();
-            Platform.runLater(() -> {
-                chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
-            });
-            try {
-                Thread.sleep(sleepMillis);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            updateChart(unsortedArray, cycles, swaps, chart);
         }
     }
 
@@ -149,17 +129,7 @@ public class SortAlgorithms {
 
             unsortedArray[j+1] = key;
 
-            int cyclesSnapshot = cycles;
-            int swapsSnapshot = swaps;
-            int[] arraySnapshot = unsortedArray.clone();
-            Platform.runLater(() -> {
-                chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
-            });
-            try {
-                Thread.sleep(sleepMillis);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            updateChart(unsortedArray, cycles, swaps, chart);
         }
     }
 
@@ -182,19 +152,23 @@ public class SortAlgorithms {
                 }
                 unsortedArray[j] = temp;
 
-                int cyclesSnapshot = cycles;
-                int swapsSnapshot = swaps;
-                int[] arraySnapshot = unsortedArray.clone();
-                Platform.runLater(() -> {
-                    chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
-                });
-                try {
-                    Thread.sleep(sleepMillis);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                updateChart(unsortedArray, cycles, swaps, chart);
             }
             gap = (int) Math.floor((double) gap / 2);
+        }
+    }
+
+    private static void updateChart(int[] array, int cycles, int swaps, IChartView chart) {
+        int cyclesSnapshot = cycles;
+        int swapsSnapshot = swaps;
+        int[] arraySnapshot = array.clone();
+        Platform.runLater(() -> {
+            chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
+        });
+        try {
+            Thread.sleep(sleepMillis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
