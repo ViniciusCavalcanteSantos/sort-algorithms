@@ -162,12 +162,13 @@ public class SortView {
 
     public void startSort() {
         threads = new Thread[charts.length];
-        for (int i = 0; i < threads.length; i++) {
-            int iSnapshot = i;
-            threads[i] = new Thread(() -> {
-                SortAlgorithms.bubbleSort(mainArray, charts[iSnapshot]);
-            });
-        }
+        threads[0] = new Thread(() -> {
+            SortAlgorithms.bubbleSort(mainArray, charts[0]);
+        });
+
+        threads[1] = new Thread(() -> {
+            SortAlgorithms.selectionSort(mainArray, charts[1]);
+        });
 
         for (int i = 0; i < threads.length; i++) {
             threads[i].start();

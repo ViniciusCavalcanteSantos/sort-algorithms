@@ -5,11 +5,10 @@ import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
 public class SortAlgorithms {
-    public static int[] bubbleSort(int[] array, IChartView chart) {
-        int[] unsortedArray = array.clone();
+    static int sleepMillis = 10;
 
-        TimeManager timeManager = new TimeManager();
-        timeManager.startTimer("teste");
+    public static void bubbleSort(int[] array, IChartView chart) {
+        int[] unsortedArray = array.clone();
 
         int cycles = 0;
         int swaps = 0;
@@ -34,7 +33,7 @@ public class SortAlgorithms {
                         chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
                     });
                     try {
-                        Thread.sleep(2);
+                        Thread.sleep(sleepMillis);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -43,9 +42,40 @@ public class SortAlgorithms {
 
             if(isSorted) break;
         }
-        timeManager.finishTimer("teste");
-        IO.println(timeManager.getTimePassed("teste"));
+    }
 
-        return unsortedArray;
+    public static void selectionSort(int[] array, IChartView chart) {
+        int[] unsortedArray = array.clone();
+
+        int cycles = 0;
+        int swaps = 0;
+        for (int i = 0; i < unsortedArray.length - 1; i++) {
+            int minIndex = i;
+
+            for (int j = i + 1; j < unsortedArray.length; j++) {
+                if(unsortedArray[j] < unsortedArray[minIndex]) {
+                    minIndex = j;
+                }
+
+                cycles++;
+            }
+
+            int temp = unsortedArray[i];
+            unsortedArray[i] = unsortedArray[minIndex];
+            unsortedArray[minIndex] = temp;
+            swaps++;
+
+            int cyclesSnapshot = cycles;
+            int swapsSnapshot = swaps;
+            int[] arraySnapshot = unsortedArray.clone();
+            Platform.runLater(() -> {
+                chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
+            });
+            try {
+                Thread.sleep(sleepMillis);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
