@@ -40,14 +40,16 @@ public class ChartView implements IChartView {
         titleLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
 
         // Label Info
-        infoLabel = new Label("Ciclos: 0; Trocas: 0");
+        infoLabel = new Label("Comparações: 0;\nAtribuicões: 0");
         infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        infoLabel.setWrapText(true);
+        infoLabel.setMaxWidth(300);
 
         root.getChildren().addAll(titleLabel, chart, infoLabel);
     }
 
     public void updateChart(int[] numbers, SortStats stats) {
-        infoLabel.setText("Ciclos: %d; Trocas: %d".formatted(stats.getCycles(), stats.getSwaps()));
+        infoLabel.setText("Comparações: %d;\nAtribuicões: %d".formatted(stats.getComparisons(), stats.getAssignments()));
 
         double containerHeight = chartHeight - 10;
         int biggestNumber = ArrayHelper.getMax(numbers);

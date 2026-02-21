@@ -1,19 +1,19 @@
 package org.viniciuscsantos.Views;
 
 public class SortStats {
-    private final int cycles;
-    private final int swaps;
+    private final int comparisons;
+    private final int assignments;
 
-    public SortStats(int cycles, int swaps) {
-        this.cycles = cycles;
-        this.swaps = swaps;
+    public SortStats(int comparisons, int assignments) {
+        this.comparisons = comparisons;
+        this.assignments = assignments;
     }
 
-    public int getSwaps() {
-        return swaps;
+    public int getComparisons() {
+        return comparisons;
     }
 
-    public int getCycles() {
-        return cycles;
+    public int getAssignments() {
+        return assignments;
     }
 }

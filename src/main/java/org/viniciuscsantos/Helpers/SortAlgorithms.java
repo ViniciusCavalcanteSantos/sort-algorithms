@@ -29,23 +29,22 @@ public class SortAlgorithms {
     public static void bubbleSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
-        int cycles = 0;
-        int swaps = 0;
+        int comparisons = 0;
+        int assignments = 0;
         for (int i = 0; i < unsortedArray.length; i++) {
             boolean isSorted = true;
 
             for (int j = 0; j < unsortedArray.length - i - 1; j++) {
-                int current = unsortedArray[j];
-                int next = unsortedArray[j + 1];
+                comparisons++;
+                if(unsortedArray[j] > unsortedArray[j + 1]) {
+                    int temp = unsortedArray[j];
+                    unsortedArray[j] = unsortedArray[j + 1];
+                    unsortedArray[j + 1] = temp;
+                    assignments += 2;
 
-                cycles++;
-                if(current > next) {
-                    unsortedArray[j] = next;
-                    unsortedArray[j + 1] = current;
                     isSorted = false;
-                    swaps++;
 
-                    updateChart(unsortedArray, cycles, swaps, chart);
+                    updateChart(unsortedArray, comparisons, assignments, chart);
                 }
             }
 
@@ -71,25 +70,25 @@ public class SortAlgorithms {
     public static void selectionSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
-        int cycles = 0;
-        int swaps = 0;
+        int comparisons = 0;
+        int assignments = 0;
         for (int i = 0; i < unsortedArray.length - 1; i++) {
             int minIndex = i;
 
             for (int j = i + 1; j < unsortedArray.length; j++) {
+                comparisons++;
                 if(unsortedArray[j] < unsortedArray[minIndex]) {
                     minIndex = j;
                 }
 
-                cycles++;
             }
 
             int temp = unsortedArray[i];
             unsortedArray[i] = unsortedArray[minIndex];
             unsortedArray[minIndex] = temp;
-            swaps++;
+            assignments += 2;
 
-            updateChart(unsortedArray, cycles, swaps, chart);
+            updateChart(unsortedArray, comparisons, assignments, chart);
         }
     }
 
@@ -112,24 +111,28 @@ public class SortAlgorithms {
     public static void insertionSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
-        int cycles = 0;
-        int swaps = 0;
+        int comparisons = 0;
+        int assignments = 0;
 
         // [ 0, 1, 2, 5, 8, 2]
         for (int i = 1; i < unsortedArray.length; i++) {
             int key = unsortedArray[i];
             int j = i - 1;
 
-            while(j >= 0 && key < unsortedArray[j]) {
-                unsortedArray[j + 1] = unsortedArray[j];
-                j--;
-
-                cycles++;
+            while(j >= 0) {
+                comparisons++;
+                if (key < unsortedArray[j]) {
+                    unsortedArray[j + 1] = unsortedArray[j];
+                    assignments++;
+                    j--;
+                } else {
+                    break;
+                }
             }
 
-            unsortedArray[j+1] = key;
+            unsortedArray[j+1] = key; assignments++;
 
-            updateChart(unsortedArray, cycles, swaps, chart);
+            updateChart(unsortedArray, comparisons, assignments, chart);
         }
     }
 
@@ -152,8 +155,8 @@ public class SortAlgorithms {
     public static void shellSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
-        int cycles = 0;
-        int swaps = 0;
+        int comparisons = 0;
+        int assignments = 0;
 
         int size = unsortedArray.length;
         int gap = (int) Math.floor((double) size / 2);
@@ -162,13 +165,21 @@ public class SortAlgorithms {
                 int temp = unsortedArray[i];
                 int j = i;
 
-                while (j >= gap && unsortedArray[j-gap] > temp) {
-                    unsortedArray[j] = unsortedArray[j-gap];
-                    j -= gap;
-                }
-                unsortedArray[j] = temp;
+                comparisons++;
+                while (j >= gap) {
+                    comparisons++;
+                    if (unsortedArray[j-gap] > temp) {
+                        unsortedArray[j] = unsortedArray[j-gap];
+                        assignments++;
+                        j -= gap;
+                    } else {
+                        break;
+                    }
 
-                updateChart(unsortedArray, cycles, swaps, chart);
+                }
+                unsortedArray[j] = temp;  assignments++;
+
+                updateChart(unsortedArray, comparisons, assignments, chart);
             }
             gap = (int) Math.floor((double) gap / 2);
         }
@@ -183,16 +194,16 @@ public class SortAlgorithms {
      * </p>
      *
      * @param array O estado atual do array sendo ordenado.
-     * @param cycles O número atual de ciclos (comparações/iterações) realizados.
-     * @param swaps O número atual de trocas realizadas.
+     * @param comparisons O número atual de ciclos comparações.
+     * @param assignments O número atual de atribuições realizadas.
      * @param chart A interface do gráfico a ser atualizada.
      */
-    private static void updateChart(int[] array, int cycles, int swaps, IChartView chart) {
-        int cyclesSnapshot = cycles;
-        int swapsSnapshot = swaps;
+    private static void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+        int comparisonsSnapshot = comparisons;
+        int assignmentsSnapshot = assignments;
         int[] arraySnapshot = array.clone();
         Platform.runLater(() -> {
-            chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
+            chart.updateChart(arraySnapshot, new SortStats(comparisonsSnapshot, assignmentsSnapshot));
         });
         try {
             Thread.sleep(sleepMillis);
