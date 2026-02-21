@@ -47,47 +47,72 @@ public class SortView {
         grid.setVgap(5);
 
         // Selecionar renderização
+        VBox renderContainer = new VBox();
+        Label cbRenderTitle = new Label("Render:");
+        cbRenderTitle.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
+
         cbRenderMethod = new ChoiceBox(FXCollections.observableArrayList(
                 "Canvas", "VBox"
         ));
         cbRenderMethod.setValue("Canvas");
         cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
 
-        // Selecionar tipo de geração números
+        renderContainer.getChildren().addAll(cbRenderTitle, cbRenderMethod);
+
+        // Selecionar modo de geração números
+        VBox generateContainer = new VBox();
+        Label labelGenerateMethod = new Label("Geração:");
+        labelGenerateMethod.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
+
         cbGenerateMethod = new ChoiceBox(FXCollections.observableArrayList(
                 "Ordenado", "Aleatório"
         ));
         cbGenerateMethod.setValue("Ordenado");
         cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
+        generateContainer.getChildren().addAll(labelGenerateMethod, cbGenerateMethod);
 
 
-        // Inicio/Fim (ordenado)
+        // Input Inicio
+        VBox tfFromContainer = new VBox();
+        Label labelTfFrom = new Label("De:");
+        labelTfFrom.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
         tfFrom = new TextField("0");
-        tfTo = new TextField("200");
+        tfFromContainer.getChildren().addAll(labelTfFrom, tfFrom);
 
-        // Quantidade (aleatório)
+        // Input Fim
+        VBox tfToContainer = new VBox();
+        Label labelTfTo = new Label("Até:");
+        labelTfTo.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
+        tfTo = new TextField("200");
+        tfToContainer.getChildren().addAll(labelTfTo, tfTo);
+
+        // Input Quantidade
+        VBox tfAmounContainer = new VBox();
+        tfAmounContainer.setVisible(false);
+        tfAmounContainer.setManaged(false);
+        Label labelTfAmount = new Label("Quantidade:");
+        labelTfAmount.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
         tfAmount = new TextField("200");
-        tfAmount.setVisible(false);
-        tfAmount.setManaged(false);
+
+        tfAmounContainer.getChildren().addAll(labelTfAmount, tfAmount);
 
         Button buttonGenerate = new Button("Gerar");
-        buttonGenerate.setStyle("-fx-background-color: aqua;");
 
         // Elementos
         button = new Button("Iniciar");
         button.setStyle("-fx-background-color: aqua;");
 
         // Posicionamento do Grid
-        GridPane.setConstraints(cbRenderMethod, 0, 0);
-        GridPane.setConstraints(cbGenerateMethod, 1, 0);
+        GridPane.setConstraints(renderContainer, 0, 0);
+        GridPane.setConstraints(generateContainer, 1, 0);
 
-        GridPane.setConstraints(tfFrom, 0, 1);
-        GridPane.setConstraints(tfTo, 1, 1);
-        GridPane.setConstraints(tfAmount, 0, 2);
+        GridPane.setConstraints(tfFromContainer, 0, 1);
+        GridPane.setConstraints(tfToContainer, 1, 1);
+        GridPane.setConstraints(tfAmounContainer, 0, 2);
         GridPane.setConstraints(buttonGenerate, 2, 0);
         GridPane.setConstraints(button, 3, 0);
 
-        grid.getChildren().addAll(cbRenderMethod, cbGenerateMethod, tfFrom, tfTo, tfAmount, buttonGenerate, button);
+        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, buttonGenerate, button);
 
         chartsContainer = new HBox(10);
         generateCharts();
@@ -98,11 +123,11 @@ public class SortView {
                     @Override
                     public void changed(ObservableValue<? extends Number> ov, Number value, Number newValue) {
                         if(newValue.intValue() == 0) {
-                            tfAmount.setVisible(false);
-                            tfAmount.setManaged(false);
+                            tfAmounContainer.setVisible(false);
+                            tfAmounContainer.setManaged(false);
                         } else {
-                            tfAmount.setVisible(true);
-                            tfAmount.setManaged(true);
+                            tfAmounContainer.setVisible(true);
+                            tfAmounContainer.setManaged(true);
                         }
                     }
                 }

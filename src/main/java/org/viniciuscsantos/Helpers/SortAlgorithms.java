@@ -227,6 +227,8 @@ public class SortAlgorithms {
             lastUpdateTimes.put(chart, now);
         }
 
+        timeManager.printElapsedNanos("updateChart");
+
         if(sleepMillis > 0) {
             try {
                 Thread.sleep(sleepMillis);
