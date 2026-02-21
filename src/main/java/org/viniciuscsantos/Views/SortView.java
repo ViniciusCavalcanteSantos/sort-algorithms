@@ -130,13 +130,15 @@ public class SortView {
         int to = Integer.parseInt(tfTo.getText());
         int amount = Integer.parseInt(tfAmount.getText());
 
-        charts = new IChartView[2];
+        charts = new IChartView[3];
         for (int i = 0; i < charts.length; i++) {
             String title;
             if(i == 0) {
                 title = "Bubble Sort";
             } else if (i == 1) {
                 title = "Selection Sort";
+            } else if (i == 2){
+                title = "Insertion Sort";
             } else {
                 title = "";
             }
@@ -177,6 +179,10 @@ public class SortView {
 
         threads[1] = new Thread(() -> {
             SortAlgorithms.selectionSort(mainArray, charts[1]);
+        });
+
+        threads[2] = new Thread(() -> {
+            SortAlgorithms.insertionSort(mainArray, charts[2]);
         });
 
         for (int i = 0; i < threads.length; i++) {

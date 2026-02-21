@@ -4,6 +4,10 @@ import javafx.application.Platform;
 import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SortAlgorithms {
     static int sleepMillis = 10;
 
@@ -64,6 +68,40 @@ public class SortAlgorithms {
             unsortedArray[i] = unsortedArray[minIndex];
             unsortedArray[minIndex] = temp;
             swaps++;
+
+            int cyclesSnapshot = cycles;
+            int swapsSnapshot = swaps;
+            int[] arraySnapshot = unsortedArray.clone();
+            Platform.runLater(() -> {
+                chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
+            });
+            try {
+                Thread.sleep(sleepMillis);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void insertionSort(int[] array, IChartView chart) {
+        int[] unsortedArray = array.clone();
+
+        int cycles = 0;
+        int swaps = 0;
+
+        // [ 0, 1, 2, 5, 8, 2]
+        for (int i = 1; i < unsortedArray.length; i++) {
+            int key = unsortedArray[i];
+            int j = i - 1;
+
+            while(j >= 0 && key < unsortedArray[j]) {
+                unsortedArray[j + 1] = unsortedArray[j];
+                j--;
+
+                cycles++;
+            }
+
+            unsortedArray[j+1] = key;
 
             int cyclesSnapshot = cycles;
             int swapsSnapshot = swaps;
