@@ -19,13 +19,32 @@ public class TimeManager {
         }
     }
 
-    public String getTimePassed(String timerName) {
+    public String getElapsedTime(String timerName) {
         long[] times = timers.get(timerName);
         if(times == null) {
             return "00:00:00.000";
         }
 
-        return this.formatNanos(times[1] - times[0]);
+        long end = (times[1] == 0L) ? System.nanoTime() : times[1];
+        return this.formatNanos(end - times[0]);
+    }
+
+    public long getElapsedNanos(String timerName) {
+        long[] times = timers.get(timerName);
+        if(times == null) {
+            return 0;
+        }
+
+        long end = (times[1] == 0L) ? System.nanoTime() : times[1];
+        return end - times[0];
+    }
+
+    public void printElapsedTime(String timerName) {
+        IO.println(timerName + ": " + getElapsedTime(timerName));
+    }
+
+    public void printElapsedNanos(String timerName) {
+        IO.println(timerName + ": " + getElapsedNanos(timerName));
     }
 
     private String formatNanos(long nanos) {
