@@ -7,10 +7,13 @@ import org.viniciuscsantos.Views.SortStats;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SortAlgorithms {
     static int sleepMillis = 10;
 
+    static TimeManager timeManager = new TimeManager();
     /**
      * Implementa o algoritmo Bubble Sort.
      * <p>
@@ -50,6 +53,8 @@ public class SortAlgorithms {
 
             if(isSorted) break;
         }
+
+        forceUpdateChart(unsortedArray, comparisons, assignments, chart);
     }
 
     /**
@@ -90,6 +95,8 @@ public class SortAlgorithms {
 
             updateChart(unsortedArray, comparisons, assignments, chart);
         }
+
+        forceUpdateChart(unsortedArray, comparisons, assignments, chart);
     }
 
     /**
@@ -134,6 +141,8 @@ public class SortAlgorithms {
 
             updateChart(unsortedArray, comparisons, assignments, chart);
         }
+
+        forceUpdateChart(unsortedArray, comparisons, assignments, chart);
     }
 
     /**
@@ -183,7 +192,13 @@ public class SortAlgorithms {
             }
             gap = (int) Math.floor((double) gap / 2);
         }
+
+        forceUpdateChart(unsortedArray, comparisons, assignments, chart);
     }
+
+    public static final ConcurrentHashMap<IChartView, AtomicReference<SortStats>> mailboxes = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
+    private static final int FRAME_RATE_MS = 16;
 
     /**
      * Atualiza o gráfico visual com o estado atual do array e as estatísticas de ordenação.
@@ -199,16 +214,31 @@ public class SortAlgorithms {
      * @param chart A interface do gráfico a ser atualizada.
      */
     private static void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
-        int comparisonsSnapshot = comparisons;
-        int assignmentsSnapshot = assignments;
-        int[] arraySnapshot = array.clone();
-        Platform.runLater(() -> {
-            chart.updateChart(arraySnapshot, new SortStats(comparisonsSnapshot, assignmentsSnapshot));
-        });
-        try {
-            Thread.sleep(sleepMillis);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        timeManager.startTimer("updateChart");
+
+        mailboxes.putIfAbsent(chart, new AtomicReference<>(null));
+        lastUpdateTimes.putIfAbsent(chart, 0L);
+
+        long now = System.currentTimeMillis();
+        long lastTime = lastUpdateTimes.get(chart);
+
+        if(now - lastTime >= FRAME_RATE_MS) {
+            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments));
+            lastUpdateTimes.put(chart, now);
+        }
+
+        if(sleepMillis > 0) {
+            try {
+                Thread.sleep(sleepMillis);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    public static void forceUpdateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+        if(mailboxes.containsKey(chart)) {
+            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments));
         }
     }
 }

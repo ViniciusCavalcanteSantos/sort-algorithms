@@ -51,9 +51,10 @@ public class CanvasChartView implements IChartView {
         root.getChildren().addAll(titleLabel, chart, infoLabel);
     }
 
-    public void updateChart(int[] numbers, SortStats stats) {
+    public void updateChart(SortStats stats) {
         infoLabel.setText("Comparações: %d;\nAtribuicões: %d".formatted(stats.getComparisons(), stats.getAssignments()));
 
+        int[] numbers = stats.getArray();
         int biggestNumber = ArrayHelper.getMax(numbers);
         int size = numbers.length;
         double barWidth = chartWidth / size;

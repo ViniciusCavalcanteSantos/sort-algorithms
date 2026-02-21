@@ -1,5 +1,6 @@
 package org.viniciuscsantos.Views;
 
+import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -13,6 +14,7 @@ import org.viniciuscsantos.Interfaces.IChartView;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class SortView {
@@ -32,6 +34,8 @@ public class SortView {
 
     IChartView[] charts;
     Thread[] threads;
+
+    private AnimationTimer renderLoop;
 
     public SortView() {
         root = new VBox(10);
@@ -168,7 +172,7 @@ public class SortView {
         IO.println(Arrays.toString(mainArray));
 
         for (int i = 0; i < charts.length; i++) {
-            charts[i].updateChart(mainArray, new SortStats(from, to));
+            charts[i].updateChart(new SortStats(mainArray, from, to));
             chartsContainer.getChildren().add(charts[i].getRoot());
         }
     }
@@ -191,18 +195,45 @@ public class SortView {
             SortAlgorithms.shellSort(mainArray, charts[3]);
         });
 
+        startRenderLoop();
         for (int i = 0; i < threads.length; i++) {
             threads[i].start();
         }
+
     }
 
     public void stopSort() {
         if(threads == null || threads.length == 0) return;
 
+        stopRenderLoop();
         for (int i = 0; i < threads.length; i++) {
             if (threads[i] != null && threads[i].isAlive()) {
                 threads[i].interrupt();
             }
+        }
+    }
+
+    public void startRenderLoop() {
+        renderLoop = new AnimationTimer() {
+            @Override
+            public void handle(long l) {
+                for (IChartView chart : charts) {
+                    AtomicReference<SortStats> mailbox = SortAlgorithms.mailboxes.get(chart);
+                    if (mailbox != null) {
+                        SortStats stats = mailbox.getAndSet(null);
+                        if (stats != null) {
+                            chart.updateChart(new SortStats(stats.getArray(), stats.getComparisons(), stats.getAssignments()));
+                        }
+                    }
+                }
+            }
+        };
+        renderLoop.start();
+    }
+
+    public void stopRenderLoop() {
+        if(renderLoop != null) {
+            renderLoop.stop();
         }
     }
 
