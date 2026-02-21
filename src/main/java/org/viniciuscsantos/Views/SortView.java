@@ -21,7 +21,8 @@ public class SortView {
     private VBox root;
     private HBox chartsContainer;
 
-    private Button button;
+    private Button buttonGenerate;
+    private Button buttonStart;
 
     ChoiceBox cbRenderMethod;
     ChoiceBox cbGenerateMethod;
@@ -29,6 +30,8 @@ public class SortView {
     TextField tfFrom;
     TextField tfTo;
     TextField tfAmount;
+
+    VBox tfAmounContainer;
 
     int[] mainArray;
 
@@ -40,67 +43,58 @@ public class SortView {
     public SortView() {
         root = new VBox(10);
         root.setStyle("-fx-background-color: blue;");
+        chartsContainer = new HBox(10);
 
+        initComponents();
+        setupLayout();
+        setupEventHandlers();
+
+        generateCharts();
+    }
+
+    /**
+     * Responsável por instanciar os controles visuais.
+     */
+    private void initComponents() {
+        // Select Render
+        cbRenderMethod = new ChoiceBox(FXCollections.observableArrayList("Canvas", "VBox"));
+        cbRenderMethod.setValue("Canvas");
+        cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
+
+        // Select Generate
+        cbGenerateMethod = new ChoiceBox(FXCollections.observableArrayList("Ordenado", "Aleatório"));
+        cbGenerateMethod.setValue("Ordenado");
+        cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
+
+        // Inputs
+        tfFrom = new TextField("0");
+        tfTo = new TextField("200");
+        tfAmount = new TextField("200");
+    }
+
+    /**
+     * Responsável por posicionar os elementos na tela.
+     */
+    private void setupLayout() {
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10));
         grid.setHgap(10);
         grid.setVgap(5);
 
-        // Selecionar renderização
-        VBox renderContainer = new VBox();
-        Label cbRenderTitle = new Label("Render:");
-        cbRenderTitle.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
+        // Controls
+        VBox renderContainer = createLabeledControl("Render:", cbRenderMethod);
+        VBox generateContainer = createLabeledControl("Geração:", cbGenerateMethod);
+        VBox tfFromContainer = createLabeledControl("De:", tfFrom);
+        VBox tfToContainer = createLabeledControl("Até:", tfTo);
 
-        cbRenderMethod = new ChoiceBox(FXCollections.observableArrayList(
-                "Canvas", "VBox"
-        ));
-        cbRenderMethod.setValue("Canvas");
-        cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
-
-        renderContainer.getChildren().addAll(cbRenderTitle, cbRenderMethod);
-
-        // Selecionar modo de geração números
-        VBox generateContainer = new VBox();
-        Label labelGenerateMethod = new Label("Geração:");
-        labelGenerateMethod.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
-
-        cbGenerateMethod = new ChoiceBox(FXCollections.observableArrayList(
-                "Ordenado", "Aleatório"
-        ));
-        cbGenerateMethod.setValue("Ordenado");
-        cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
-        generateContainer.getChildren().addAll(labelGenerateMethod, cbGenerateMethod);
-
-
-        // Input Inicio
-        VBox tfFromContainer = new VBox();
-        Label labelTfFrom = new Label("De:");
-        labelTfFrom.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
-        tfFrom = new TextField("0");
-        tfFromContainer.getChildren().addAll(labelTfFrom, tfFrom);
-
-        // Input Fim
-        VBox tfToContainer = new VBox();
-        Label labelTfTo = new Label("Até:");
-        labelTfTo.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
-        tfTo = new TextField("200");
-        tfToContainer.getChildren().addAll(labelTfTo, tfTo);
-
-        // Input Quantidade
-        VBox tfAmounContainer = new VBox();
+        tfAmounContainer = createLabeledControl("Quantidade:", tfAmount);
         tfAmounContainer.setVisible(false);
         tfAmounContainer.setManaged(false);
-        Label labelTfAmount = new Label("Quantidade:");
-        labelTfAmount.setStyle("-fx-text-fill: red; -fx-padding: 0 0 4px 0");
-        tfAmount = new TextField("200");
 
-        tfAmounContainer.getChildren().addAll(labelTfAmount, tfAmount);
-
-        Button buttonGenerate = new Button("Gerar");
-
-        // Elementos
-        button = new Button("Iniciar");
-        button.setStyle("-fx-background-color: aqua;");
+        // Buttons
+        buttonGenerate = new Button("Gerar");
+        buttonStart = new Button("Iniciar");
+        buttonStart.setStyle("-fx-background-color: aqua;");
 
         // Posicionamento do Grid
         GridPane.setConstraints(renderContainer, 0, 0);
@@ -110,13 +104,19 @@ public class SortView {
         GridPane.setConstraints(tfToContainer, 1, 1);
         GridPane.setConstraints(tfAmounContainer, 0, 2);
         GridPane.setConstraints(buttonGenerate, 2, 0);
-        GridPane.setConstraints(button, 3, 0);
+        GridPane.setConstraints(buttonStart, 3, 0);
 
-        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, buttonGenerate, button);
+        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, buttonGenerate, buttonStart);
+        root.getChildren().addAll(
+                grid,
+                chartsContainer
+        );
+    }
 
-        chartsContainer = new HBox(10);
-        generateCharts();
-
+    /**
+     * Responsável por atrelar todos os eventos (Listeners e Actions) aos botões e inputs.
+     */
+    private void setupEventHandlers() {
         // Seletor de modo de geração dos números
         cbGenerateMethod.getSelectionModel().selectedIndexProperty().addListener(
                 new ChangeListener<Number>() {
@@ -140,15 +140,18 @@ public class SortView {
             generateCharts();
         });
 
-        button.setOnAction(actionEvent -> {
+        buttonStart.setOnAction(actionEvent -> {
             stopSort();
             startSort();
         });
+    }
 
-        root.getChildren().addAll(
-                grid,
-                chartsContainer
-        );
+    private VBox createLabeledControl(String labelText, Control control) {
+        VBox container = new VBox(4);
+        Label label = new Label(labelText);
+        label.setStyle("-fx-text-fill: red;");
+        container.getChildren().addAll(label, control);
+        return container;
     }
 
     public void generateCharts() {
