@@ -162,4 +162,39 @@ public class SortAlgorithms {
             }
         }
     }
+
+    public static void shellSort(int[] array, IChartView chart) {
+        int[] unsortedArray = array.clone();
+
+        int cycles = 0;
+        int swaps = 0;
+
+        int size = unsortedArray.length;
+        int gap = (int) Math.floor((double) size / 2);
+        while(gap > 0) {
+            for (int i = gap; i < size; i++) {
+                int temp = unsortedArray[i];
+                int j = i;
+
+                while (j >= gap && unsortedArray[j-gap] > temp) {
+                    unsortedArray[j] = unsortedArray[j-gap];
+                    j -= gap;
+                }
+                unsortedArray[j] = temp;
+
+                int cyclesSnapshot = cycles;
+                int swapsSnapshot = swaps;
+                int[] arraySnapshot = unsortedArray.clone();
+                Platform.runLater(() -> {
+                    chart.updateChart(arraySnapshot, new SortStats(cyclesSnapshot, swapsSnapshot));
+                });
+                try {
+                    Thread.sleep(sleepMillis);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            gap = (int) Math.floor((double) gap / 2);
+        }
+    }
 }

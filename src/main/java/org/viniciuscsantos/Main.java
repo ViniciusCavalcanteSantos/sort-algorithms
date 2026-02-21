@@ -26,7 +26,7 @@ public class Main extends Application {
 
         stage.setTitle("Ordenador - JavaFX v" + javafxVersion);
 
-        Scene scene = new Scene(mainScreen.getRoot(), 800, 600);
+        Scene scene = new Scene(mainScreen.getRoot(), 1600, 800);
         scene.getStylesheets().add(
                 getClass().getResource("/styles/base.css").toExternalForm()
         );
