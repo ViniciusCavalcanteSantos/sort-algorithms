@@ -133,6 +133,22 @@ public class SortAlgorithms {
         }
     }
 
+    /**
+     * Implementa o algoritmo Shell Sort.
+     * <p>
+     * O Shell Sort é uma generalização do Insertion Sort que permite a troca de itens distantes.
+     * A ideia é organizar a lista de elementos de modo que, começando de qualquer lugar, pegando cada h-ésimo elemento,
+     * produza uma lista ordenada.
+     * </p>
+     * <p>
+     * Complexidade de Tempo: Depende da sequência de lacunas (gaps). No pior caso, pode ser O(n²), mas com sequências otimizadas pode chegar a O(n log n).
+     * <br>
+     * Complexidade de Espaço: O(1) auxiliar.
+     * </p>
+     *
+     * @param array O array de inteiros a ser ordenado.
+     * @param chart A interface para atualização visual do gráfico.
+     */
     public static void shellSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
@@ -158,6 +174,19 @@ public class SortAlgorithms {
         }
     }
 
+    /**
+     * Atualiza o gráfico visual com o estado atual do array e as estatísticas de ordenação.
+     * <p>
+     * Este método cria snapshots dos dados para garantir que a atualização da UI ocorra de forma consistente,
+     * mesmo que o algoritmo de ordenação continue executando em outra thread.
+     * Também introduz um pequeno atraso (sleep) para permitir a visualização do processo.
+     * </p>
+     *
+     * @param array O estado atual do array sendo ordenado.
+     * @param cycles O número atual de ciclos (comparações/iterações) realizados.
+     * @param swaps O número atual de trocas realizadas.
+     * @param chart A interface do gráfico a ser atualizada.
+     */
     private static void updateChart(int[] array, int cycles, int swaps, IChartView chart) {
         int cyclesSnapshot = cycles;
         int swapsSnapshot = swaps;
