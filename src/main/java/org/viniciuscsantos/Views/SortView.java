@@ -177,9 +177,9 @@ public class SortView {
         String renderMethod = cbRenderMethod.getValue().toString();
         String generationMethod = cbGenerateMethod.getValue().toString();
 
-        int from = Integer.parseInt(tfFrom.getText());
-        int to = Integer.parseInt(tfTo.getText());
-        int amount = Integer.parseInt(tfAmount.getText());
+        int from = stringToInt(tfFrom.getText(), 0);
+        int to = stringToInt(tfTo.getText(), 200);
+        int amount = stringToInt(tfAmount.getText(), 100);
 
         charts = new IChartView[4];
         for (int i = 0; i < charts.length; i++) {
@@ -227,7 +227,7 @@ public class SortView {
     public void startSort() {
         startRenderLoop();
 
-        int speedThrottle = Integer.parseInt(tfSpeedThrottle.getText());
+        int speedThrottle = stringToInt(tfSpeedThrottle.getText(), 5);
         sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.startAlgorithm(Algorithms.BUBBLE_SORT, mainArray, charts[0]);
         sortAlgorithms.startAlgorithm(Algorithms.SELECTION_SORT, mainArray, charts[1]);
@@ -245,7 +245,7 @@ public class SortView {
     }
 
     public void resumeSort() {
-        int speedThrottle = Integer.parseInt(tfSpeedThrottle.getText());
+        int speedThrottle = stringToInt(tfSpeedThrottle.getText(), 5);
         sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.resumeAll();
         buttonStart.setText("Pausar");
@@ -282,5 +282,13 @@ public class SortView {
 
     public VBox getRoot() {
         return root;
+    }
+
+    private int stringToInt(String text, int fallback) {
+        try {
+            return Integer.parseInt(text);
+        } catch (Exception e) {
+            return fallback;
+        }
     }
 }
