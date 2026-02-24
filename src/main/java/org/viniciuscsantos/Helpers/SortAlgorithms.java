@@ -23,7 +23,7 @@ public class SortAlgorithms {
     private final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
     private static final int FRAME_RATE_MS = 16;
 
-    private static TimeManager timeManager = new TimeManager();
+    private final TimeManager timeManager = new TimeManager();
 
     public void startAlgorithm(Algorithms algorithm, int[] array, IChartView chart) {
         isRunning = true;
@@ -59,13 +59,16 @@ public class SortAlgorithms {
         activeThreads.clear();
         mailboxes.clear();
         lastUpdateTimes.clear();
+        timeManager.clearAllTimers();
     }
 
     public void pauseAll() {
+        timeManager.pauseAllTimers();
         isPaused = true;
     }
 
     public void resumeAll() {
+        timeManager.resumeAllTimers();
         isPaused = false;
     }
 
