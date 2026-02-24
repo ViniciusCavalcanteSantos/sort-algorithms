@@ -1,19 +1,79 @@
 package org.viniciuscsantos.Helpers;
 
-import javafx.application.Platform;
+import org.viniciuscsantos.Enums.Algorithms;
 import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SortAlgorithms {
-    static int sleepMillis = 10;
+    static int sleepMillis = 1;
 
     static TimeManager timeManager = new TimeManager();
+
+    private boolean isRunning = false;
+    private boolean isPaused = false;
+    List<Thread> activeThreads = new ArrayList<>();
+
+    private static class SortStoppedException extends RuntimeException {}
+
+    // Screen Control
+    public final ConcurrentHashMap<IChartView, AtomicReference<SortStats>> mailboxes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
+    private static final int FRAME_RATE_MS = 16;
+
+    public void startAlgorithm(Algorithms algorithm, int[] array, IChartView chart) {
+        isRunning = true;
+        Thread thread = new Thread(() -> {
+           try {
+               switch (algorithm) {
+                   case BUBBLE_SORT -> bubbleSort(array, chart);
+                   case SELECTION_SORT -> selectionSort(array, chart);
+                   case INSERTION_SORT -> insertionSort(array, chart);
+                   case SHELL_SORT -> shellSort(array, chart);
+                   default -> throw new RuntimeException("Algorítimo não suportado: " + algorithm);
+               }
+           } catch (SortStoppedException e) {
+
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+        });
+
+        activeThreads.add(thread);
+        thread.start();
+    }
+
+    public void stopAll() {
+        isRunning = false;
+        isPaused = false;
+        for (Thread t : activeThreads) {
+            t.interrupt();
+        }
+        activeThreads.clear();
+        mailboxes.clear();
+        lastUpdateTimes.clear();
+    }
+
+    public void pauseAll() {
+        isPaused = true;
+    }
+
+    public void resumeAll() {
+        isPaused = false;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
     /**
      * Implementa o algoritmo Bubble Sort.
      * <p>
@@ -29,7 +89,7 @@ public class SortAlgorithms {
      * @param array O array de inteiros a ser ordenado.
      * @param chart A interface para atualização visual do gráfico.
      */
-    public static void bubbleSort(int[] array, IChartView chart) {
+    private void bubbleSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         int comparisons = 0;
@@ -72,7 +132,7 @@ public class SortAlgorithms {
      * @param array O array de inteiros a ser ordenado.
      * @param chart A interface para atualização visual do gráfico.
      */
-    public static void selectionSort(int[] array, IChartView chart) {
+    private void selectionSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         int comparisons = 0;
@@ -115,7 +175,7 @@ public class SortAlgorithms {
      * @param array O array de inteiros a ser ordenado.
      * @param chart A interface para atualização visual do gráfico.
      */
-    public static void insertionSort(int[] array, IChartView chart) {
+    private void insertionSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         int comparisons = 0;
@@ -161,7 +221,7 @@ public class SortAlgorithms {
      * @param array O array de inteiros a ser ordenado.
      * @param chart A interface para atualização visual do gráfico.
      */
-    public static void shellSort(int[] array, IChartView chart) {
+    private void shellSort(int[] array, IChartView chart) {
         int[] unsortedArray = array.clone();
 
         int comparisons = 0;
@@ -196,10 +256,6 @@ public class SortAlgorithms {
         forceUpdateChart(unsortedArray, comparisons, assignments, chart);
     }
 
-    public static final ConcurrentHashMap<IChartView, AtomicReference<SortStats>> mailboxes = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
-    private static final int FRAME_RATE_MS = 16;
-
     /**
      * Atualiza o gráfico visual com o estado atual do array e as estatísticas de ordenação.
      * <p>
@@ -213,8 +269,8 @@ public class SortAlgorithms {
      * @param assignments O número atual de atribuições realizadas.
      * @param chart A interface do gráfico a ser atualizada.
      */
-    private static void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
-        timeManager.startTimer("updateChart");
+    private void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+        handleThreadState();
 
         mailboxes.putIfAbsent(chart, new AtomicReference<>(null));
         lastUpdateTimes.putIfAbsent(chart, 0L);
@@ -227,8 +283,6 @@ public class SortAlgorithms {
             lastUpdateTimes.put(chart, now);
         }
 
-        timeManager.printElapsedNanos("updateChart");
-
         if(sleepMillis > 0) {
             try {
                 Thread.sleep(sleepMillis);
@@ -238,9 +292,26 @@ public class SortAlgorithms {
         }
     }
 
-    public static void forceUpdateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+    public void forceUpdateChart(int[] array, int comparisons, int assignments, IChartView chart) {
         if(mailboxes.containsKey(chart)) {
             mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments));
+        }
+    }
+
+    /**
+     * Trava a thread se estiver pausada e lança exceção se for parada.
+     */
+    private void handleThreadState() {
+        if (!isRunning) {
+            throw new SortStoppedException();
+        }
+        while (isPaused && isRunning) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new SortStoppedException();
+            }
         }
     }
 }

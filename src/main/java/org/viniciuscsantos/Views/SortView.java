@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import org.viniciuscsantos.Enums.Algorithms;
 import org.viniciuscsantos.Helpers.ArrayHelper;
 import org.viniciuscsantos.Helpers.SortAlgorithms;
 import org.viniciuscsantos.Interfaces.IChartView;
@@ -36,9 +37,9 @@ public class SortView {
     int[] mainArray;
 
     IChartView[] charts;
-    Thread[] threads;
 
     private AnimationTimer renderLoop;
+    private final SortAlgorithms sortAlgorithms = new SortAlgorithms();
 
     public SortView() {
         root = new VBox(10);
@@ -141,8 +142,20 @@ public class SortView {
         });
 
         buttonStart.setOnAction(actionEvent -> {
-            stopSort();
-            startSort();
+            if(sortAlgorithms.isRunning() && !sortAlgorithms.isPaused()) {
+                pauseSort();
+                return;
+            }
+
+            if(sortAlgorithms.isRunning() && sortAlgorithms.isPaused()) {
+                resumeSort();
+                return;
+            }
+
+            if(!sortAlgorithms.isRunning()) {
+                stopSort();
+                startSort();
+            }
         });
     }
 
@@ -206,39 +219,30 @@ public class SortView {
     }
 
     public void startSort() {
-        threads = new Thread[charts.length];
-        threads[0] = new Thread(() -> {
-            SortAlgorithms.bubbleSort(mainArray, charts[0]);
-        });
-
-        threads[1] = new Thread(() -> {
-            SortAlgorithms.selectionSort(mainArray, charts[1]);
-        });
-
-        threads[2] = new Thread(() -> {
-            SortAlgorithms.insertionSort(mainArray, charts[2]);
-        });
-
-        threads[3] = new Thread(() -> {
-            SortAlgorithms.shellSort(mainArray, charts[3]);
-        });
-
         startRenderLoop();
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].start();
-        }
+        sortAlgorithms.startAlgorithm(Algorithms.BUBBLE_SORT, mainArray, charts[0]);
+        sortAlgorithms.startAlgorithm(Algorithms.SELECTION_SORT, mainArray, charts[1]);
+        sortAlgorithms.startAlgorithm(Algorithms.INSERTION_SORT, mainArray, charts[2]);
+        sortAlgorithms.startAlgorithm(Algorithms.SHELL_SORT, mainArray, charts[3]);
 
+        buttonStart.setText("Pausar");
     }
 
     public void stopSort() {
-        if(threads == null || threads.length == 0) return;
-
+        sortAlgorithms.stopAll();
         stopRenderLoop();
-        for (int i = 0; i < threads.length; i++) {
-            if (threads[i] != null && threads[i].isAlive()) {
-                threads[i].interrupt();
-            }
-        }
+
+        buttonStart.setText("Iniciar");
+    }
+
+    public void resumeSort() {
+        sortAlgorithms.resumeAll();
+        buttonStart.setText("Pausar");
+    }
+
+    public void pauseSort() {
+        sortAlgorithms.pauseAll();
+        buttonStart.setText("Iniciar");
     }
 
     public void startRenderLoop() {
@@ -246,7 +250,7 @@ public class SortView {
             @Override
             public void handle(long l) {
                 for (IChartView chart : charts) {
-                    AtomicReference<SortStats> mailbox = SortAlgorithms.mailboxes.get(chart);
+                    AtomicReference<SortStats> mailbox = sortAlgorithms.mailboxes.get(chart);
                     if (mailbox != null) {
                         SortStats stats = mailbox.getAndSet(null);
                         if (stats != null) {
