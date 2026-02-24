@@ -10,9 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SortAlgorithms {
-    static int sleepMillis = 1;
+    private int sleepMillis = 1;
 
-    static TimeManager timeManager = new TimeManager();
+    public void setSleepMillis(int sleepMillis) {
+        this.sleepMillis = sleepMillis;
+    }
 
     private boolean isRunning = false;
     private boolean isPaused = false;
@@ -20,7 +22,7 @@ public class SortAlgorithms {
 
     private static class SortStoppedException extends RuntimeException {}
 
-    // Screen Control
+    // Screen FPS Control
     public final ConcurrentHashMap<IChartView, AtomicReference<SortStats>> mailboxes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
     private static final int FRAME_RATE_MS = 16;

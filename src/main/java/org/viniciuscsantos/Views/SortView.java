@@ -32,6 +32,8 @@ public class SortView {
     TextField tfTo;
     TextField tfAmount;
 
+    TextField tfSpeedThrottle;
+
     VBox tfAmounContainer;
 
     int[] mainArray;
@@ -71,6 +73,7 @@ public class SortView {
         tfFrom = new TextField("0");
         tfTo = new TextField("200");
         tfAmount = new TextField("200");
+        tfSpeedThrottle = new TextField("5");
     }
 
     /**
@@ -87,6 +90,7 @@ public class SortView {
         VBox generateContainer = createLabeledControl("Geração:", cbGenerateMethod);
         VBox tfFromContainer = createLabeledControl("De:", tfFrom);
         VBox tfToContainer = createLabeledControl("Até:", tfTo);
+        VBox tfSpeedThrottleContainer = createLabeledControl("Espera (milisegundos):", tfSpeedThrottle);
 
         tfAmounContainer = createLabeledControl("Quantidade:", tfAmount);
         tfAmounContainer.setVisible(false);
@@ -104,10 +108,12 @@ public class SortView {
         GridPane.setConstraints(tfFromContainer, 0, 1);
         GridPane.setConstraints(tfToContainer, 1, 1);
         GridPane.setConstraints(tfAmounContainer, 0, 2);
-        GridPane.setConstraints(buttonGenerate, 2, 0);
-        GridPane.setConstraints(buttonStart, 3, 0);
+        GridPane.setConstraints(tfSpeedThrottleContainer, 2, 0);
 
-        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, buttonGenerate, buttonStart);
+        GridPane.setConstraints(buttonGenerate, 3, 0);
+        GridPane.setConstraints(buttonStart, 4, 0);
+
+        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, tfSpeedThrottleContainer, buttonGenerate, buttonStart);
         root.getChildren().addAll(
                 grid,
                 chartsContainer
@@ -220,6 +226,9 @@ public class SortView {
 
     public void startSort() {
         startRenderLoop();
+
+        int speedThrottle = Integer.parseInt(tfSpeedThrottle.getText());
+        sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.startAlgorithm(Algorithms.BUBBLE_SORT, mainArray, charts[0]);
         sortAlgorithms.startAlgorithm(Algorithms.SELECTION_SORT, mainArray, charts[1]);
         sortAlgorithms.startAlgorithm(Algorithms.INSERTION_SORT, mainArray, charts[2]);
@@ -236,6 +245,8 @@ public class SortView {
     }
 
     public void resumeSort() {
+        int speedThrottle = Integer.parseInt(tfSpeedThrottle.getText());
+        sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.resumeAll();
         buttonStart.setText("Pausar");
     }
