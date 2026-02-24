@@ -1,7 +1,7 @@
-.titulo {
-    -fx-background-color: aqua;
-}
-
-.titulo:hover {
-    -fx-background-color: #137878;
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }

@@ -3,6 +3,7 @@ package org.viniciuscsantos.Views;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.viniciuscsantos.Enums.Algorithms;
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
 
 public class SortView {
     private final VBox root;
-    private final HBox chartsContainer;
+    private final FlowPane chartsContainer;
 
     private Button buttonGenerate;
     private Button buttonToggleAll;
@@ -44,7 +45,8 @@ public class SortView {
     public SortView() {
         root = new VBox(10);
         root.setStyle("-fx-background-color: blue;");
-        chartsContainer = new HBox(10);
+        chartsContainer = new FlowPane(10, 10);
+        chartsContainer.setAlignment(Pos.CENTER);
 
         initComponents();
         setupLayout();
@@ -78,6 +80,7 @@ public class SortView {
      * Responsável por posicionar os elementos na tela.
      */
     private void setupLayout() {
+        // Posicionamento do Grid de Opções
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(10));
         grid.setHgap(10);
@@ -99,7 +102,6 @@ public class SortView {
         buttonToggleAll = new Button("Iniciar");
         buttonToggleAll.setStyle("-fx-background-color: aqua;");
 
-        // Posicionamento do Grid
         GridPane.setConstraints(renderContainer, 0, 0);
         GridPane.setConstraints(generateContainer, 1, 0);
 
@@ -112,6 +114,7 @@ public class SortView {
         GridPane.setConstraints(buttonToggleAll, 4, 0);
 
         grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, tfSpeedThrottleContainer, buttonGenerate, buttonToggleAll);
+
         root.getChildren().addAll(
                 grid,
                 chartsContainer
