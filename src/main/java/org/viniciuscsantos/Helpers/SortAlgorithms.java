@@ -4,29 +4,31 @@ import org.viniciuscsantos.Enums.Algorithms;
 import org.viniciuscsantos.Interfaces.IChartView;
 import org.viniciuscsantos.Views.SortStats;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SortAlgorithms {
     private int sleepMillis = 1;
 
-    private boolean isRunning = false;
-    private boolean isPaused = false;
-    List<Thread> activeThreads = new ArrayList<>();
+    private final TimeManager timeManager = new TimeManager();
 
-    private static class SortStoppedException extends RuntimeException {}
+    private final ConcurrentHashMap<IChartView, Thread> activeThreads = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IChartView, Boolean> runningStates = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<IChartView, Boolean> pausedStates = new ConcurrentHashMap<>();
 
     // Screen FPS Control
     public final ConcurrentHashMap<IChartView, AtomicReference<SortStats>> mailboxes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
     private static final int FRAME_RATE_MS = 16;
 
-    private final TimeManager timeManager = new TimeManager();
+    // Exceptions
+    private static class SortStoppedException extends RuntimeException {}
+
 
     public void startAlgorithm(Algorithms algorithm, int[] array, IChartView chart) {
-        isRunning = true;
+        if(runningStates.getOrDefault(chart, false)) return;
+        runningStates.put(chart, true);
+        pausedStates.put(chart, false);
 
         String timerkey = chart.toString();
         timeManager.startTimer(timerkey);
@@ -41,43 +43,62 @@ public class SortAlgorithms {
                }
            } catch (SortStoppedException e) {
 
-           } catch (Exception e) {
-               e.printStackTrace();
+           } finally {
+               runningStates.put(chart, false);
            }
         });
 
-        activeThreads.add(thread);
+        activeThreads.put(chart, thread);
         thread.start();
     }
 
-    public void stopAll() {
-        isRunning = false;
-        isPaused = false;
-        for (Thread t : activeThreads) {
-            t.interrupt();
+    public void stopAlgorithm(IChartView chart) {
+        runningStates.put(chart, false);
+        Thread thread = activeThreads.get(chart);
+        if(thread != null) {
+            thread.interrupt();
+            activeThreads.remove(chart);
         }
+    }
+
+    public void stopAll() {
+        activeThreads.values().forEach(Thread::interrupt);
         activeThreads.clear();
         mailboxes.clear();
         lastUpdateTimes.clear();
         timeManager.clearAllTimers();
+        runningStates.clear();
+        pausedStates.clear();
+    }
+
+    public void pauseAlgorithm(IChartView chart) {
+        if(runningStates.getOrDefault(chart, false)) {
+            pausedStates.put(chart, true);
+        }
+    }
+
+    public void resumeAlgorithm(IChartView chart) {
+        if(runningStates.getOrDefault(chart, false)) {
+            pausedStates.put(chart, false);
+        }
     }
 
     public void pauseAll() {
         timeManager.pauseAllTimers();
-        isPaused = true;
+        pausedStates.replaceAll((chart, state) -> true);
     }
 
     public void resumeAll() {
         timeManager.resumeAllTimers();
-        isPaused = false;
+        pausedStates.replaceAll((chart, state) -> false);
     }
 
-    public boolean isRunning() {
-        return isRunning;
+    public boolean isRunning(IChartView chart) {
+        return runningStates.getOrDefault(chart, false);
     }
 
-    public boolean isPaused() {
-        return isPaused;
+    public boolean isPaused(IChartView chart) {
+        return pausedStates.getOrDefault(chart, false);
     }
 
     public void setSleepMillis(int sleepMillis) {
@@ -280,7 +301,7 @@ public class SortAlgorithms {
      * @param chart A interface do gráfico a ser atualizada.
      */
     private void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
-        handleThreadState();
+        handleThreadState(chart);
 
         String timerkey = chart.toString();
         long elapsedNanos = timeManager.getElapsedNanos(timerkey);
@@ -314,11 +335,11 @@ public class SortAlgorithms {
     /**
      * Trava a thread se estiver pausada e lança exceção se for parada.
      */
-    private void handleThreadState() {
-        if (!isRunning) {
+    private void handleThreadState(IChartView chart) {
+        if (!isRunning(chart)) {
             throw new SortStoppedException();
         }
-        while (isPaused && isRunning) {
+        while (isPaused(chart) && isRunning(chart)) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {

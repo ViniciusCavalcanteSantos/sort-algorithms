@@ -23,7 +23,7 @@ public class SortView {
     private HBox chartsContainer;
 
     private Button buttonGenerate;
-    private Button buttonStart;
+    private Button buttonToggleAll;
 
     ChoiceBox cbRenderMethod;
     ChoiceBox cbGenerateMethod;
@@ -98,8 +98,8 @@ public class SortView {
 
         // Buttons
         buttonGenerate = new Button("Gerar");
-        buttonStart = new Button("Iniciar");
-        buttonStart.setStyle("-fx-background-color: aqua;");
+        buttonToggleAll = new Button("Iniciar");
+        buttonToggleAll.setStyle("-fx-background-color: aqua;");
 
         // Posicionamento do Grid
         GridPane.setConstraints(renderContainer, 0, 0);
@@ -111,9 +111,9 @@ public class SortView {
         GridPane.setConstraints(tfSpeedThrottleContainer, 2, 0);
 
         GridPane.setConstraints(buttonGenerate, 3, 0);
-        GridPane.setConstraints(buttonStart, 4, 0);
+        GridPane.setConstraints(buttonToggleAll, 4, 0);
 
-        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, tfSpeedThrottleContainer, buttonGenerate, buttonStart);
+        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, tfSpeedThrottleContainer, buttonGenerate, buttonToggleAll);
         root.getChildren().addAll(
                 grid,
                 chartsContainer
@@ -147,21 +147,27 @@ public class SortView {
             generateCharts();
         });
 
-        buttonStart.setOnAction(actionEvent -> {
-            if(sortAlgorithms.isRunning() && !sortAlgorithms.isPaused()) {
+        buttonToggleAll.setOnAction(actionEvent -> {
+            boolean atLeastOneRunning = false;
+            boolean atLeastOnePaused = false;
+            for (IChartView chart : charts) {
+                if(!atLeastOneRunning && sortAlgorithms.isRunning(chart)) atLeastOneRunning = true;
+                if(!atLeastOnePaused && sortAlgorithms.isPaused(chart)) atLeastOnePaused = true;
+            }
+
+
+            if(atLeastOneRunning && !atLeastOnePaused) {
                 pauseSort();
                 return;
             }
 
-            if(sortAlgorithms.isRunning() && sortAlgorithms.isPaused()) {
+            if(atLeastOneRunning && atLeastOnePaused) {
                 resumeSort();
                 return;
             }
 
-            if(!sortAlgorithms.isRunning()) {
-                stopSort();
-                startSort();
-            }
+            stopSort();
+            startSort();
         });
     }
 
@@ -234,26 +240,26 @@ public class SortView {
         sortAlgorithms.startAlgorithm(Algorithms.INSERTION_SORT, mainArray, charts[2]);
         sortAlgorithms.startAlgorithm(Algorithms.SHELL_SORT, mainArray, charts[3]);
 
-        buttonStart.setText("Pausar");
+        buttonToggleAll.setText("Pausar");
     }
 
     public void stopSort() {
-        sortAlgorithms.stopAll();
+        sortAlgorithms.pauseAll();
         stopRenderLoop();
 
-        buttonStart.setText("Iniciar");
+        buttonToggleAll.setText("Iniciar");
     }
 
     public void resumeSort() {
         int speedThrottle = stringToInt(tfSpeedThrottle.getText(), 5);
         sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.resumeAll();
-        buttonStart.setText("Pausar");
+        buttonToggleAll.setText("Pausar");
     }
 
     public void pauseSort() {
         sortAlgorithms.pauseAll();
-        buttonStart.setText("Iniciar");
+        buttonToggleAll.setText("Iniciar");
     }
 
     public void startRenderLoop() {
