@@ -25,7 +25,7 @@ public class SortAlgorithms {
     private static class SortStoppedException extends RuntimeException {}
 
 
-    public void startAlgorithm(Algorithms algorithm, int[] array, IChartView chart) {
+    public void start(Algorithms algorithm, int[] array, IChartView chart) {
         if(runningStates.getOrDefault(chart, false)) return;
         runningStates.put(chart, true);
         pausedStates.put(chart, false);
@@ -41,7 +41,7 @@ public class SortAlgorithms {
                    case SHELL_SORT -> shellSort(array, chart);
                    default -> throw new RuntimeException("Algorítimo não suportado: " + algorithm);
                }
-           } catch (SortStoppedException e) {
+           } catch (SortStoppedException _) {
 
            } finally {
                runningStates.put(chart, false);
@@ -52,7 +52,7 @@ public class SortAlgorithms {
         thread.start();
     }
 
-    public void stopAlgorithm(IChartView chart) {
+    public void stop(IChartView chart) {
         runningStates.put(chart, false);
         Thread thread = activeThreads.get(chart);
         if(thread != null) {

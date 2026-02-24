@@ -1,8 +1,6 @@
 package org.viniciuscsantos.Views;
 
 import javafx.animation.AnimationTimer;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -19,14 +17,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class SortView {
-    private VBox root;
-    private HBox chartsContainer;
+    private final VBox root;
+    private final HBox chartsContainer;
 
     private Button buttonGenerate;
     private Button buttonToggleAll;
 
-    ChoiceBox cbRenderMethod;
-    ChoiceBox cbGenerateMethod;
+    ChoiceBox<String> cbRenderMethod;
+    ChoiceBox<String> cbGenerateMethod;
 
     TextField tfFrom;
     TextField tfTo;
@@ -60,12 +58,12 @@ public class SortView {
      */
     private void initComponents() {
         // Select Render
-        cbRenderMethod = new ChoiceBox(FXCollections.observableArrayList("Canvas", "VBox"));
+        cbRenderMethod = new ChoiceBox<>(FXCollections.observableArrayList("Canvas", "VBox"));
         cbRenderMethod.setValue("Canvas");
         cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
 
         // Select Generate
-        cbGenerateMethod = new ChoiceBox(FXCollections.observableArrayList("Ordenado", "Aleatório"));
+        cbGenerateMethod = new ChoiceBox<>(FXCollections.observableArrayList("Ordenado", "Aleatório"));
         cbGenerateMethod.setValue("Ordenado");
         cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
 
@@ -126,28 +124,25 @@ public class SortView {
     private void setupEventHandlers() {
         // Seletor de modo de geração dos números
         cbGenerateMethod.getSelectionModel().selectedIndexProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> ov, Number value, Number newValue) {
-                        if(newValue.intValue() == 0) {
-                            tfAmounContainer.setVisible(false);
-                            tfAmounContainer.setManaged(false);
-                        } else {
-                            tfAmounContainer.setVisible(true);
-                            tfAmounContainer.setManaged(true);
-                        }
+                (_, _, newValue) -> {
+                    if(newValue.intValue() == 0) {
+                        tfAmounContainer.setVisible(false);
+                        tfAmounContainer.setManaged(false);
+                    } else {
+                        tfAmounContainer.setVisible(true);
+                        tfAmounContainer.setManaged(true);
                     }
                 }
         );
 
-        buttonGenerate.setOnAction(actionEvent -> {
+        buttonGenerate.setOnAction(_ -> {
             stopSort();
 
             chartsContainer.getChildren().clear();
             generateCharts();
         });
 
-        buttonToggleAll.setOnAction(actionEvent -> {
+        buttonToggleAll.setOnAction(_ -> {
             boolean atLeastOneRunning = false;
             boolean atLeastOnePaused = false;
             for (IChartView chart : charts) {
@@ -180,8 +175,8 @@ public class SortView {
     }
 
     public void generateCharts() {
-        String renderMethod = cbRenderMethod.getValue().toString();
-        String generationMethod = cbGenerateMethod.getValue().toString();
+        String renderMethod = cbRenderMethod.getValue();
+        String generationMethod = cbGenerateMethod.getValue();
 
         int from = stringToInt(tfFrom.getText(), 0);
         int to = stringToInt(tfTo.getText(), 200);
@@ -224,9 +219,9 @@ public class SortView {
         IO.println("Array gerado");
         IO.println(Arrays.toString(mainArray));
 
-        for (int i = 0; i < charts.length; i++) {
-            charts[i].updateChart(new SortStats(mainArray, from, to, 0L));
-            chartsContainer.getChildren().add(charts[i].getRoot());
+        for (IChartView chart : charts) {
+            chart.updateChart(new SortStats(mainArray, from, to, 0L));
+            chartsContainer.getChildren().add(chart.getRoot());
         }
     }
 
@@ -235,10 +230,10 @@ public class SortView {
 
         int speedThrottle = stringToInt(tfSpeedThrottle.getText(), 5);
         sortAlgorithms.setSleepMillis(speedThrottle);
-        sortAlgorithms.startAlgorithm(Algorithms.BUBBLE_SORT, mainArray, charts[0]);
-        sortAlgorithms.startAlgorithm(Algorithms.SELECTION_SORT, mainArray, charts[1]);
-        sortAlgorithms.startAlgorithm(Algorithms.INSERTION_SORT, mainArray, charts[2]);
-        sortAlgorithms.startAlgorithm(Algorithms.SHELL_SORT, mainArray, charts[3]);
+        sortAlgorithms.start(Algorithms.BUBBLE_SORT, mainArray, charts[0]);
+        sortAlgorithms.start(Algorithms.SELECTION_SORT, mainArray, charts[1]);
+        sortAlgorithms.start(Algorithms.INSERTION_SORT, mainArray, charts[2]);
+        sortAlgorithms.start(Algorithms.SHELL_SORT, mainArray, charts[3]);
 
         buttonToggleAll.setText("Pausar");
     }
