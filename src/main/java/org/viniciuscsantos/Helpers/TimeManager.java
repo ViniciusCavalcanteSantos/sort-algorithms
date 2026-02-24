@@ -47,7 +47,7 @@ public class TimeManager {
         IO.println(timerName + ": " + getElapsedNanos(timerName));
     }
 
-    private String formatNanos(long nanos) {
+    public String formatNanos(long nanos) {
         long hours = TimeUnit.NANOSECONDS.toHours(nanos);
         long minutes = TimeUnit.NANOSECONDS.toMinutes(nanos) % 60;
         long seconds = TimeUnit.NANOSECONDS.toSeconds(nanos) % 60;

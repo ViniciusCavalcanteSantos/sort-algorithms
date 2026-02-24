@@ -12,10 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SortAlgorithms {
     private int sleepMillis = 1;
 
-    public void setSleepMillis(int sleepMillis) {
-        this.sleepMillis = sleepMillis;
-    }
-
     private boolean isRunning = false;
     private boolean isPaused = false;
     List<Thread> activeThreads = new ArrayList<>();
@@ -27,8 +23,13 @@ public class SortAlgorithms {
     private final ConcurrentHashMap<IChartView, Long> lastUpdateTimes = new ConcurrentHashMap<>();
     private static final int FRAME_RATE_MS = 16;
 
+    private static TimeManager timeManager = new TimeManager();
+
     public void startAlgorithm(Algorithms algorithm, int[] array, IChartView chart) {
         isRunning = true;
+
+        String timerkey = chart.toString();
+        timeManager.startTimer(timerkey);
         Thread thread = new Thread(() -> {
            try {
                switch (algorithm) {
@@ -74,6 +75,10 @@ public class SortAlgorithms {
 
     public boolean isPaused() {
         return isPaused;
+    }
+
+    public void setSleepMillis(int sleepMillis) {
+        this.sleepMillis = sleepMillis;
     }
 
     /**
@@ -274,6 +279,9 @@ public class SortAlgorithms {
     private void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
         handleThreadState();
 
+        String timerkey = chart.toString();
+        long elapsedNanos = timeManager.getElapsedNanos(timerkey);
+
         mailboxes.putIfAbsent(chart, new AtomicReference<>(null));
         lastUpdateTimes.putIfAbsent(chart, 0L);
 
@@ -281,7 +289,7 @@ public class SortAlgorithms {
         long lastTime = lastUpdateTimes.get(chart);
 
         if(now - lastTime >= FRAME_RATE_MS) {
-            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments));
+            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments, elapsedNanos));
             lastUpdateTimes.put(chart, now);
         }
 
@@ -294,9 +302,9 @@ public class SortAlgorithms {
         }
     }
 
-    public void forceUpdateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+    private void forceUpdateChart(int[] array, int comparisons, int assignments, IChartView chart) {
         if(mailboxes.containsKey(chart)) {
-            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments));
+            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments, null));
         }
     }
 

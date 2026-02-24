@@ -219,7 +219,7 @@ public class SortView {
         IO.println(Arrays.toString(mainArray));
 
         for (int i = 0; i < charts.length; i++) {
-            charts[i].updateChart(new SortStats(mainArray, from, to));
+            charts[i].updateChart(new SortStats(mainArray, from, to, 0L));
             chartsContainer.getChildren().add(charts[i].getRoot());
         }
     }
@@ -265,7 +265,7 @@ public class SortView {
                     if (mailbox != null) {
                         SortStats stats = mailbox.getAndSet(null);
                         if (stats != null) {
-                            chart.updateChart(new SortStats(stats.getArray(), stats.getComparisons(), stats.getAssignments()));
+                            chart.updateChart(new SortStats(stats.getArray(), stats.getComparisons(), stats.getAssignments(), stats.getElapsedNanos()));
                         }
                     }
                 }

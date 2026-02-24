@@ -8,6 +8,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.viniciuscsantos.Helpers.ArrayHelper;
+import org.viniciuscsantos.Helpers.TimeManager;
 import org.viniciuscsantos.Interfaces.IChartView;
 
 public class ChartView implements IChartView {
@@ -16,9 +17,12 @@ public class ChartView implements IChartView {
     private HBox chart;
     private Label titleLabel;
     private Label infoLabel;
+    private Label timerLabel;
 
     double chartWidth = 300;
     double chartHeight = 300;
+
+    private TimeManager timeManager = new TimeManager();
 
     public ChartView(String title) {
         root = new VBox(5);
@@ -45,11 +49,20 @@ public class ChartView implements IChartView {
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(300);
 
-        root.getChildren().addAll(titleLabel, chart, infoLabel);
+        // Timer
+        timerLabel = new Label("Tempo: ");
+        timerLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+
+        root.getChildren().addAll(titleLabel, chart, infoLabel, timerLabel);
     }
 
     public void updateChart(SortStats stats) {
         infoLabel.setText("Comparações: %d;\nAtribuicões: %d".formatted(stats.getComparisons(), stats.getAssignments()));
+
+        Long nanos = stats.getElapsedNanos();
+        if(nanos != null) {
+            timerLabel.setText("Tempo: " + timeManager.formatNanos(nanos));
+        }
 
         double containerHeight = chartHeight - 10;
         int[] numbers = stats.getArray();

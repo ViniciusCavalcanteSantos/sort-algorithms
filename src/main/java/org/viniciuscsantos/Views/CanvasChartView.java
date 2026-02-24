@@ -11,6 +11,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.viniciuscsantos.Helpers.ArrayHelper;
+import org.viniciuscsantos.Helpers.TimeManager;
 import org.viniciuscsantos.Interfaces.IChartView;
 
 public class CanvasChartView implements IChartView {
@@ -21,11 +22,12 @@ public class CanvasChartView implements IChartView {
 
     private Label titleLabel;
     private Label infoLabel;
+    private Label timerLabel;
 
     double chartWidth = 300;
     double chartHeight = 300;
 
-    double prefGap = 2;
+    private TimeManager timeManager = new TimeManager();
 
     public CanvasChartView(String title) {
         root = new VBox(5);
@@ -48,11 +50,20 @@ public class CanvasChartView implements IChartView {
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(300);
 
-        root.getChildren().addAll(titleLabel, chart, infoLabel);
+        // Timer
+        timerLabel = new Label("Tempo: ");
+        timerLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+
+        root.getChildren().addAll(titleLabel, chart, infoLabel, timerLabel);
     }
 
     public void updateChart(SortStats stats) {
         infoLabel.setText("Comparações: %d;\nAtribuicões: %d".formatted(stats.getComparisons(), stats.getAssignments()));
+
+        Long nanos = stats.getElapsedNanos();
+        if(nanos != null) {
+            timerLabel.setText("Tempo: " + timeManager.formatNanos(nanos));
+        }
 
         int[] numbers = stats.getArray();
         int biggestNumber = ArrayHelper.getMax(numbers);
