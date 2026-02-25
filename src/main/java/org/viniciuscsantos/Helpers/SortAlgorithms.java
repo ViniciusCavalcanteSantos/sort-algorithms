@@ -139,6 +139,7 @@ public class SortAlgorithms {
                     isSorted = false;
 
                     updateChart(unsortedArray, comparisons, assignments, chart, j, j+1);
+                    sleep();
                 }
             }
 
@@ -176,7 +177,6 @@ public class SortAlgorithms {
                 if(unsortedArray[j] < unsortedArray[minIndex]) {
                     minIndex = j;
                 }
-                updateChart(unsortedArray, comparisons, assignments, chart, j, minIndex);
 
             }
 
@@ -185,6 +185,8 @@ public class SortAlgorithms {
             unsortedArray[minIndex] = temp;
             assignments += 2;
 
+            updateChart(unsortedArray, comparisons, assignments, chart, i, minIndex);
+            sleep();
         }
 
         forceUpdateChart(unsortedArray, comparisons, assignments, chart);
@@ -231,6 +233,7 @@ public class SortAlgorithms {
             unsortedArray[j+1] = key; assignments++;
 
             updateChart(unsortedArray, comparisons, assignments, chart, j+1);
+            sleep();
         }
 
         forceUpdateChart(unsortedArray, comparisons, assignments, chart);
@@ -280,6 +283,7 @@ public class SortAlgorithms {
                 unsortedArray[j] = temp;  assignments++;
 
                 updateChart(unsortedArray, comparisons, assignments, chart, j);
+                sleep();
             }
             gap = (int) Math.floor((double) gap / 2);
         }
@@ -292,7 +296,6 @@ public class SortAlgorithms {
      * <p>
      * Este método cria snapshots dos dados para garantir que a atualização da UI ocorra de forma consistente,
      * mesmo que o algoritmo de ordenação continue executando em outra thread.
-     * Também introduz um pequeno atraso (sleep) para permitir a visualização do processo.
      * </p>
      *
      * @param array O estado atual do array sendo ordenado.
@@ -317,7 +320,9 @@ public class SortAlgorithms {
             mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments, elapsedNanos, markers));
             lastUpdateTimes.put(chart, now);
         }
+    }
 
+    private void sleep() {
         if(sleepMillis > 0) {
             try {
                 Thread.sleep(sleepMillis);
