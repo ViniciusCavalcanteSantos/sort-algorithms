@@ -25,12 +25,7 @@ public class Main extends Application {
         String javafxVersion = System.getProperty("javafx.version");
         stage.setTitle("Ordenador - JavaFX v" + javafxVersion);
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(mainScreen.getRoot());
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.getStyleClass().add("scroll-pane");
-        Scene scene = new Scene(scrollPane, 1600, 800);
+        Scene scene = new Scene(mainScreen.getRoot(), 1600, 800);
         scene.getStylesheets().add(
                 getClass().getResource("/styles/base.css").toExternalForm()
         );

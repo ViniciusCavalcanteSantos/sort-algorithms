@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import org.viniciuscsantos.Enums.Algorithms;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class SortView {
-    private final VBox root;
+    private final BorderPane root;
     private final FlowPane chartsContainer;
 
     private Button buttonGenerate;
@@ -43,13 +44,13 @@ public class SortView {
     private final SortAlgorithms sortAlgorithms = new SortAlgorithms();
 
     public SortView() {
-        root = new VBox(20);
+        root = new BorderPane();
         root.getStyleClass().add("main-view");
-        root.setPadding(new Insets(20));
         
         chartsContainer = new FlowPane(20, 20);
         chartsContainer.setAlignment(Pos.CENTER);
         chartsContainer.getStyleClass().add("charts-container");
+        chartsContainer.setPadding(new Insets(20));
 
         initComponents();
         setupLayout();
@@ -67,12 +68,14 @@ public class SortView {
         cbRenderMethod.setValue("Canvas");
         cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
         cbRenderMethod.getStyleClass().add("choice-box");
+        cbRenderMethod.setMaxWidth(Double.MAX_VALUE);
 
         // Select Generate
         cbGenerateMethod = new ChoiceBox<>(FXCollections.observableArrayList("Ordenado", "Aleatório"));
         cbGenerateMethod.setValue("Ordenado");
         cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
         cbGenerateMethod.getStyleClass().add("choice-box");
+        cbGenerateMethod.setMaxWidth(Double.MAX_VALUE);
 
         // Inputs
         tfFrom = new TextField("0");
@@ -85,49 +88,64 @@ public class SortView {
      * Responsável por posicionar os elementos na tela.
      */
     private void setupLayout() {
-        // Posicionamento do Grid de Opções
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(15));
-        grid.setHgap(15);
-        grid.setVgap(10);
-        grid.getStyleClass().add("controls-grid");
-        grid.setStyle("-fx-background-color: #252526; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
+        // Sidebar
+        VBox sidebar = new VBox(15);
+        sidebar.getStyleClass().add("sidebar");
+        sidebar.setPrefWidth(280);
+        sidebar.setMinWidth(280);
 
         // Controls
-        VBox renderContainer = createLabeledControl("Render:", cbRenderMethod);
-        VBox generateContainer = createLabeledControl("Geração:", cbGenerateMethod);
+        VBox renderContainer = createLabeledControl("Renderização:", cbRenderMethod);
+        VBox generateContainer = createLabeledControl("Método de Geração:", cbGenerateMethod);
+        
+        Separator sep1 = new Separator();
+        
         VBox tfFromContainer = createLabeledControl("De:", tfFrom);
         VBox tfToContainer = createLabeledControl("Até:", tfTo);
-        VBox tfSpeedThrottleContainer = createLabeledControl("Espera (ms):", tfSpeedThrottle);
-
         tfAmounContainer = createLabeledControl("Quantidade:", tfAmount);
         tfAmounContainer.setVisible(false);
         tfAmounContainer.setManaged(false);
 
+        Separator sep2 = new Separator();
+
+        VBox tfSpeedThrottleContainer = createLabeledControl("Espera (ms):", tfSpeedThrottle);
+
         // Buttons
-        buttonGenerate = new Button("Gerar");
+        buttonGenerate = new Button("Gerar Novos Dados");
         buttonGenerate.getStyleClass().add("button");
+        buttonGenerate.setMaxWidth(Double.MAX_VALUE);
         
-        buttonToggleAll = new Button("Iniciar");
+        buttonToggleAll = new Button("Iniciar Ordenação");
         buttonToggleAll.getStyleClass().addAll("button", "primary");
+        buttonToggleAll.setMaxWidth(Double.MAX_VALUE);
 
-        GridPane.setConstraints(renderContainer, 0, 0);
-        GridPane.setConstraints(generateContainer, 1, 0);
+        VBox buttonsContainer = new VBox(10, buttonGenerate, buttonToggleAll);
 
-        GridPane.setConstraints(tfFromContainer, 0, 1);
-        GridPane.setConstraints(tfToContainer, 1, 1);
-        GridPane.setConstraints(tfAmounContainer, 0, 2);
-        GridPane.setConstraints(tfSpeedThrottleContainer, 2, 0);
-
-        GridPane.setConstraints(buttonGenerate, 3, 0);
-        GridPane.setConstraints(buttonToggleAll, 4, 0);
-
-        grid.getChildren().addAll(renderContainer, generateContainer, tfFromContainer, tfToContainer, tfAmounContainer, tfSpeedThrottleContainer, buttonGenerate, buttonToggleAll);
-
-        root.getChildren().addAll(
-                grid,
-                chartsContainer
+        sidebar.getChildren().addAll(
+            createSectionLabel("Configuração"),
+            renderContainer, 
+            generateContainer,
+            sep1,
+            createSectionLabel("Dados"),
+            tfFromContainer, 
+            tfToContainer, 
+            tfAmounContainer,
+            sep2,
+            createSectionLabel("Controle"),
+            tfSpeedThrottleContainer,
+            new Region(), // Spacer
+            buttonsContainer
         );
+
+        // Center Area (Charts)
+        ScrollPane scrollPane = new ScrollPane(chartsContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.getStyleClass().add("scroll-pane");
+        scrollPane.setStyle("-fx-background-color: transparent;");
+
+        root.setLeft(sidebar);
+        root.setCenter(scrollPane);
     }
 
     /**
@@ -179,11 +197,17 @@ public class SortView {
     }
 
     private VBox createLabeledControl(String labelText, Control control) {
-        VBox container = new VBox(4);
+        VBox container = new VBox(5);
         Label label = new Label(labelText);
-        label.getStyleClass().add("sidebar-label");
+        label.getStyleClass().add("info-label");
         container.getChildren().addAll(label, control);
         return container;
+    }
+
+    private Label createSectionLabel(String text) {
+        Label label = new Label(text);
+        label.getStyleClass().add("sidebar-label");
+        return label;
     }
 
     public void generateCharts() {
@@ -256,7 +280,7 @@ public class SortView {
         sortAlgorithms.pauseAll();
         stopRenderLoop();
 
-        buttonToggleAll.setText("Iniciar");
+        buttonToggleAll.setText("Iniciar Ordenação");
         buttonToggleAll.getStyleClass().remove("accent");
         buttonToggleAll.getStyleClass().add("primary");
     }
@@ -272,7 +296,7 @@ public class SortView {
 
     public void pauseSort() {
         sortAlgorithms.pauseAll();
-        buttonToggleAll.setText("Iniciar");
+        buttonToggleAll.setText("Retomar");
         buttonToggleAll.getStyleClass().remove("accent");
         buttonToggleAll.getStyleClass().add("primary");
     }
@@ -301,7 +325,7 @@ public class SortView {
         }
     }
 
-    public VBox getRoot() {
+    public Parent getRoot() {
         return root;
     }
 
