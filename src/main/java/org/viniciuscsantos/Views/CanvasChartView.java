@@ -1,13 +1,9 @@
 package org.viniciuscsantos.Views;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.viniciuscsantos.Helpers.ArrayHelper;
@@ -32,27 +28,27 @@ public class CanvasChartView implements IChartView {
     public CanvasChartView(String title) {
         root = new VBox(5);
         root.setPadding(new Insets(10, 5, 0, 5));
+        root.getStyleClass().add("chart-container");
 
         // Gráfico
         chart = new Canvas(chartWidth, chartHeight);
         gc = chart.getGraphicsContext2D();
 
-        gc.setFill(Color.AQUA);
-        gc.fillRect(0, 0, chartWidth, chartHeight);
+        gc.clearRect(0, 0, chartWidth, chartHeight);
 
         // Label Title
         titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        titleLabel.getStyleClass().add("chart-title");
 
         // Label Info
         infoLabel = new Label("Comparações: 0;\nAtribuicões: 0");
-        infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        infoLabel.getStyleClass().add("chart-stats");
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(300);
 
         // Timer
         timerLabel = new Label("Tempo: ");
-        timerLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        timerLabel.getStyleClass().add("chart-stats");
 
         root.getChildren().addAll(titleLabel, chart, infoLabel, timerLabel);
     }
@@ -70,10 +66,9 @@ public class CanvasChartView implements IChartView {
         int size = numbers.length;
         double barWidth = chartWidth / size;
 
-        gc.setFill(Color.AQUA);
-        gc.fillRect(0, 0, chartWidth, chartHeight);
+        gc.clearRect(0, 0, chartWidth, chartHeight);
 
-        gc.setFill(Color.RED);
+        gc.setFill(Color.web("#4ec9b0")); // Match CSS accent color
 
         for (int i = 0; i < numbers.length; i++) {
             int number = numbers[i];

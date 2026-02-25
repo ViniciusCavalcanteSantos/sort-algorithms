@@ -43,10 +43,13 @@ public class SortView {
     private final SortAlgorithms sortAlgorithms = new SortAlgorithms();
 
     public SortView() {
-        root = new VBox(10);
-        root.setStyle("-fx-background-color: blue;");
-        chartsContainer = new FlowPane(10, 10);
+        root = new VBox(20);
+        root.getStyleClass().add("main-view");
+        root.setPadding(new Insets(20));
+        
+        chartsContainer = new FlowPane(20, 20);
         chartsContainer.setAlignment(Pos.CENTER);
+        chartsContainer.getStyleClass().add("charts-container");
 
         initComponents();
         setupLayout();
@@ -63,11 +66,13 @@ public class SortView {
         cbRenderMethod = new ChoiceBox<>(FXCollections.observableArrayList("Canvas", "VBox"));
         cbRenderMethod.setValue("Canvas");
         cbRenderMethod.setTooltip(new Tooltip("Selecione uma opção"));
+        cbRenderMethod.getStyleClass().add("choice-box");
 
         // Select Generate
         cbGenerateMethod = new ChoiceBox<>(FXCollections.observableArrayList("Ordenado", "Aleatório"));
         cbGenerateMethod.setValue("Ordenado");
         cbGenerateMethod.setTooltip(new Tooltip("Selecione uma opção"));
+        cbGenerateMethod.getStyleClass().add("choice-box");
 
         // Inputs
         tfFrom = new TextField("0");
@@ -82,16 +87,18 @@ public class SortView {
     private void setupLayout() {
         // Posicionamento do Grid de Opções
         GridPane grid = new GridPane();
-        grid.setPadding(new Insets(10));
-        grid.setHgap(10);
-        grid.setVgap(5);
+        grid.setPadding(new Insets(15));
+        grid.setHgap(15);
+        grid.setVgap(10);
+        grid.getStyleClass().add("controls-grid");
+        grid.setStyle("-fx-background-color: #252526; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
 
         // Controls
         VBox renderContainer = createLabeledControl("Render:", cbRenderMethod);
         VBox generateContainer = createLabeledControl("Geração:", cbGenerateMethod);
         VBox tfFromContainer = createLabeledControl("De:", tfFrom);
         VBox tfToContainer = createLabeledControl("Até:", tfTo);
-        VBox tfSpeedThrottleContainer = createLabeledControl("Espera (milisegundos):", tfSpeedThrottle);
+        VBox tfSpeedThrottleContainer = createLabeledControl("Espera (ms):", tfSpeedThrottle);
 
         tfAmounContainer = createLabeledControl("Quantidade:", tfAmount);
         tfAmounContainer.setVisible(false);
@@ -99,8 +106,10 @@ public class SortView {
 
         // Buttons
         buttonGenerate = new Button("Gerar");
+        buttonGenerate.getStyleClass().add("button");
+        
         buttonToggleAll = new Button("Iniciar");
-        buttonToggleAll.setStyle("-fx-background-color: aqua;");
+        buttonToggleAll.getStyleClass().addAll("button", "primary");
 
         GridPane.setConstraints(renderContainer, 0, 0);
         GridPane.setConstraints(generateContainer, 1, 0);
@@ -172,7 +181,7 @@ public class SortView {
     private VBox createLabeledControl(String labelText, Control control) {
         VBox container = new VBox(4);
         Label label = new Label(labelText);
-        label.setStyle("-fx-text-fill: red;");
+        label.getStyleClass().add("sidebar-label");
         container.getChildren().addAll(label, control);
         return container;
     }
@@ -219,8 +228,8 @@ public class SortView {
             }
         }
 
-        IO.println("Array gerado");
-        IO.println(Arrays.toString(mainArray));
+        System.out.println("Array gerado");
+        System.out.println(Arrays.toString(mainArray));
 
         for (IChartView chart : charts) {
             chart.updateChart(new SortStats(mainArray, from, to, 0L));
@@ -239,6 +248,8 @@ public class SortView {
         sortAlgorithms.start(Algorithms.SHELL_SORT, mainArray, charts[3]);
 
         buttonToggleAll.setText("Pausar");
+        buttonToggleAll.getStyleClass().remove("primary");
+        buttonToggleAll.getStyleClass().add("accent");
     }
 
     public void stopSort() {
@@ -246,6 +257,8 @@ public class SortView {
         stopRenderLoop();
 
         buttonToggleAll.setText("Iniciar");
+        buttonToggleAll.getStyleClass().remove("accent");
+        buttonToggleAll.getStyleClass().add("primary");
     }
 
     public void resumeSort() {
@@ -253,11 +266,15 @@ public class SortView {
         sortAlgorithms.setSleepMillis(speedThrottle);
         sortAlgorithms.resumeAll();
         buttonToggleAll.setText("Pausar");
+        buttonToggleAll.getStyleClass().remove("primary");
+        buttonToggleAll.getStyleClass().add("accent");
     }
 
     public void pauseSort() {
         sortAlgorithms.pauseAll();
         buttonToggleAll.setText("Iniciar");
+        buttonToggleAll.getStyleClass().remove("accent");
+        buttonToggleAll.getStyleClass().add("primary");
     }
 
     public void startRenderLoop() {

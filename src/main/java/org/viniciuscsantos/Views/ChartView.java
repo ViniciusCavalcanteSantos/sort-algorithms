@@ -27,6 +27,7 @@ public class ChartView implements IChartView {
     public ChartView(String title) {
         root = new VBox(5);
         root.setPadding(new Insets(10, 5, 0, 5));
+        root.getStyleClass().add("chart-container");
 
         // Gráfico
         chart = new HBox(0);
@@ -36,22 +37,21 @@ public class ChartView implements IChartView {
         chart.setMinHeight(chartHeight);
         chart.setMaxHeight(chartHeight);
         chart.setAlignment(Pos.BOTTOM_CENTER);
-        chart.setStyle("-fx-background-color: aqua;");
         chart.setPadding(new Insets(10, 5, 0, 5));
 
         // Label Title
         titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        titleLabel.getStyleClass().add("chart-title");
 
         // Label Info
         infoLabel = new Label("Comparações: 0;\nAtribuicões: 0");
-        infoLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        infoLabel.getStyleClass().add("chart-stats");
         infoLabel.setWrapText(true);
         infoLabel.setMaxWidth(300);
 
         // Timer
         timerLabel = new Label("Tempo: ");
-        timerLabel.setStyle("-fx-font-size: 20px;-fx-text-fill: red");
+        timerLabel.getStyleClass().add("chart-stats");
 
         root.getChildren().addAll(titleLabel, chart, infoLabel, timerLabel);
     }
@@ -97,7 +97,7 @@ public class ChartView implements IChartView {
         bar.setMinHeight(height);
         bar.setMaxHeight(height);
 
-        bar.setStyle("-fx-background-color: red;");
+        bar.getStyleClass().add("chart-bar");
         HBox.setHgrow(bar, Priority.ALWAYS);
 
         chart.getChildren().add(bar);
