@@ -286,7 +286,7 @@ public class SortView {
                     if (mailbox != null) {
                         SortStats stats = mailbox.getAndSet(null);
                         if (stats != null) {
-                            chart.updateChart(new SortStats(stats.getArray(), stats.getComparisons(), stats.getAssignments(), stats.getElapsedNanos()));
+                            chart.updateChart(new SortStats(stats.getArray(), stats.getComparisons(), stats.getAssignments(), stats.getElapsedNanos(), stats.getMarkers()));
                         }
                     }
                 }

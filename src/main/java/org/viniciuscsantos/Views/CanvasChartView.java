@@ -1,9 +1,13 @@
 package org.viniciuscsantos.Views;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.viniciuscsantos.Helpers.ArrayHelper;
@@ -68,7 +72,7 @@ public class CanvasChartView implements IChartView {
 
         gc.clearRect(0, 0, chartWidth, chartHeight);
 
-        gc.setFill(Color.web("#4ec9b0")); // Match CSS accent color
+        int[] markers = stats.getMarkers();
 
         for (int i = 0; i < numbers.length; i++) {
             int number = numbers[i];
@@ -78,8 +82,20 @@ public class CanvasChartView implements IChartView {
             double x = i*barWidth;
             double y = chartHeight - height;
 
-            gc.fillRect(x, y, barWidth + 1, height);
+            if (markers != null && contains(markers, i)) {
+                gc.setFill(Color.web("#FFC107")); // Amarelo/Ouro
+            } else {
+                gc.setFill(Color.web("#4ec9b0")); // Match CSS accent color
+            }
+            gc.fillRect(x, y, barWidth, height);
         }
+    }
+
+    private boolean contains(int[] array, int value) {
+        for (int i : array) {
+            if (i == value) return true;
+        }
+        return false;
     }
 
     public VBox getRoot() {

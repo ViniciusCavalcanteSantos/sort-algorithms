@@ -137,6 +137,10 @@
     -fx-background-color: #6fd6c1;
 }
 
+.chart-bar-highlight {
+    -fx-background-color: #FFC107;
+}
+
 /* Sidebar */
 .sidebar {
     -fx-background-color: #252526;

@@ -138,7 +138,7 @@ public class SortAlgorithms {
 
                     isSorted = false;
 
-                    updateChart(unsortedArray, comparisons, assignments, chart);
+                    updateChart(unsortedArray, comparisons, assignments, chart, j, j+1);
                 }
             }
 
@@ -176,6 +176,7 @@ public class SortAlgorithms {
                 if(unsortedArray[j] < unsortedArray[minIndex]) {
                     minIndex = j;
                 }
+                updateChart(unsortedArray, comparisons, assignments, chart, j, minIndex);
 
             }
 
@@ -184,7 +185,6 @@ public class SortAlgorithms {
             unsortedArray[minIndex] = temp;
             assignments += 2;
 
-            updateChart(unsortedArray, comparisons, assignments, chart);
         }
 
         forceUpdateChart(unsortedArray, comparisons, assignments, chart);
@@ -230,7 +230,7 @@ public class SortAlgorithms {
 
             unsortedArray[j+1] = key; assignments++;
 
-            updateChart(unsortedArray, comparisons, assignments, chart);
+            updateChart(unsortedArray, comparisons, assignments, chart, j+1);
         }
 
         forceUpdateChart(unsortedArray, comparisons, assignments, chart);
@@ -279,7 +279,7 @@ public class SortAlgorithms {
                 }
                 unsortedArray[j] = temp;  assignments++;
 
-                updateChart(unsortedArray, comparisons, assignments, chart);
+                updateChart(unsortedArray, comparisons, assignments, chart, j);
             }
             gap = (int) Math.floor((double) gap / 2);
         }
@@ -299,8 +299,9 @@ public class SortAlgorithms {
      * @param comparisons O número atual de ciclos comparações.
      * @param assignments O número atual de atribuições realizadas.
      * @param chart A interface do gráfico a ser atualizada.
+     * @param markers Índices dos elementos a serem destacados.
      */
-    private void updateChart(int[] array, int comparisons, int assignments, IChartView chart) {
+    private void updateChart(int[] array, int comparisons, int assignments, IChartView chart, int... markers) {
         handleThreadState(chart);
 
         String timerkey = chart.toString();
@@ -313,7 +314,7 @@ public class SortAlgorithms {
         long lastTime = lastUpdateTimes.get(chart);
 
         if(now - lastTime >= FRAME_RATE_MS) {
-            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments, elapsedNanos));
+            mailboxes.get(chart).set(new SortStats(array.clone(), comparisons, assignments, elapsedNanos, markers));
             lastUpdateTimes.put(chart, now);
         }
 

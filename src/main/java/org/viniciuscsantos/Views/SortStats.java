@@ -5,12 +5,14 @@ public class SortStats {
     private final int comparisons;
     private final int assignments;
     private final Long elapsedNanos;
+    private final int[] markers;
 
-    public SortStats(int[] array, int comparisons, int assignments, Long elapsedNanos) {
+    public SortStats(int[] array, int comparisons, int assignments, Long elapsedNanos, int... markers) {
         this.array = array;
         this.comparisons = comparisons;
         this.assignments = assignments;
         this.elapsedNanos = elapsedNanos;
+        this.markers = markers;
     }
 
     public int[] getArray() {
@@ -26,4 +28,8 @@ public class SortStats {
     }
 
     public Long getElapsedNanos() {return elapsedNanos;}
+
+    public int[] getMarkers() {
+        return markers;
+    }
 }

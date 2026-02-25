@@ -67,6 +67,7 @@ public class ChartView implements IChartView {
         double containerHeight = chartHeight - 10;
         int[] numbers = stats.getArray();
         int biggestNumber = ArrayHelper.getMax(numbers);
+        int[] markers = stats.getMarkers();
 
         if(chart.getChildren().isEmpty()) {
             for (int i = 0; i < numbers.length; i++) {
@@ -86,9 +87,22 @@ public class ChartView implements IChartView {
                 bar.setPrefHeight(height);
                 bar.setMinHeight(height);
                 bar.setMaxHeight(height);
+
+                if (markers != null && contains(markers, i)) {
+                    bar.setStyle("-fx-background-color: #FFC107;"); // Amarelo/Ouro
+                } else {
+                    bar.setStyle(""); // Reverte para o estilo da folha de estilos
+                }
             }
         }
 
+    }
+
+    private boolean contains(int[] array, int value) {
+        for (int i : array) {
+            if (i == value) return true;
+        }
+        return false;
     }
 
     private void addBar(double height) {
