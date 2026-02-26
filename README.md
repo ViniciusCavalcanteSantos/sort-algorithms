@@ -84,7 +84,7 @@ src/main/java/org/viniciuscsantos
 ## 📦 Instalação e Execução
 
 ### Pré-requisitos
-*   **Java JDK 17+**
+*   **Java JDK 25+**
 *   **Maven 3.6+**
 
 ### Passos
@@ -186,7 +186,8 @@ jpackage \
   --runtime-image target/image \
   --icon icon.png \
   --linux-shortcut \
-  --linux-menu-group Utility \
+  --linux-menu-group Utility \ 
+  --vendor "seu-nome" \
   --linux-deb-maintainer "seu-email@email.com"
 ```
 
