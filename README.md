@@ -128,6 +128,87 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir **Issues** ou en
 
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
+# 📦 Build e Empacotamento (Instaladores Nativos)
+
+Este projeto utiliza o sistema de módulos do Java (Jigsaw) combinado com o Maven para gerar uma imagem runtime otimizada (`jlink`) e instaladores nativos (`jpackage`) para Linux e Windows.
+
+---
+
+## 📋 Pré-requisitos
+
+Antes de gerar os instaladores, certifique-se de ter as ferramentas de sistema instaladas:
+
+- **Windows (.msi):**  
+  Instale o [WiX Toolset](https://github.com/wixtoolset/wix3/releases) (necessário para o `jpackage` gerar instaladores Windows).
+
+## 1️⃣ Compilar e Gerar o Runtime (jlink)
+
+O primeiro passo é limpar o projeto, compilar e gerar a imagem JRE customizada contendo o JavaFX e o módulo do aplicativo.
+
+Execute na raiz do projeto:
+
+```bash
+mvn clean package javafx:jlink
+```
+
+### 🧪 Nota de Teste
+
+Após a execução, você pode testar se a imagem foi gerada corretamente rodando:
+
+- **Linux:**
+  ```bash
+  ./target/image/bin/java -m sort.algorithms/org.viniciuscsantos.Main
+  ```
+
+- **Windows (PowerShell):**
+  ```powershell 
+  . arget\imagein\java.exe -m sort.algorithms/org.viniciuscsantos.Main
+  ```
+
+## 2️⃣ Gerar o Instalador (jpackage)
+
+Após gerar o runtime com sucesso (`target/image`), utilize os comandos abaixo de acordo com o seu sistema operacional.
+
+Os instaladores serão gerados na pasta `dist/`.
+
+---
+
+### 🐧 Para Linux (.deb)
+
+Requer um ícone no formato `.png` na raiz do projeto.
+
+```bash
+jpackage \
+  --type deb \
+  --dest dist \
+  --name SortAlgorithms \
+  --module sort.algorithms/org.viniciuscsantos.Main \
+  --runtime-image target/image \
+  --icon icon.png \
+  --linux-shortcut \
+  --linux-menu-group Utility \
+  --linux-deb-maintainer "seu-email@email.com"
+```
+
+---
+
+### 🪟 Para Windows (.msi ou .exe)
+
+Requer um ícone no formato `.ico` na raiz do projeto.
+
+```powershell
+jpackage `
+  --type msi `
+  --dest dist `
+  --name SortAlgorithms `
+  --module sort.algorithms/org.viniciuscsantos.Main `
+  --runtime-image target\image `
+  --icon icon.ico `
+  --win-dir-chooser `
+  --win-shortcut `
+  --win-menu
+```
+
 ---
 
 <div align="center">
